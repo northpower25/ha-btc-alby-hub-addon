@@ -406,10 +406,17 @@ Repository hinzufügen:
 Add-on Konfiguration:
   node_mode: cloud
   nwc_connection_string: "nostr+walletconnect://..."  ← hier einfügen
+  nostr_relay_enabled: true                            ← falls eigenes Relay genutzt wird
+  nostr_relay_tor_enabled: true                        ← nur wirksam bei nostr_relay_enabled: true
       │
       ▼
 Add-on starten → Integration einrichten
   (HA → Einstellungen → Geräte & Dienste → + Integration → „Alby Hub")
+      │
+      ▼
+Bei aktivierter Tor-Option wird beim Erststart automatisch ein Onion-Service für
+das NOSTR Relay eingerichtet. Damit ist das Relay erreichbar ohne separate VPS-
+Verbindung und ohne Port-Öffnung am Router.
       │
       ▼
 Verbindungstest → Entities werden angelegt ✓
@@ -866,6 +873,8 @@ Cookie: session=<session-token>
 node_mode: cloud            # cloud | expert
 log_level: info
 nostr_relay_enabled: false
+nostr_relay_tor_enabled: false
+# Hinweis: nostr_relay_tor_enabled greift nur, wenn nostr_relay_enabled: true
 backup_passphrase: ""
 external_access_enabled: false
 
@@ -1201,6 +1210,8 @@ HA NFC-Automation ausgelöst
 
 - Optional aktivierbares Relay im selben Add-on-Container
 - WebSocket-Endpoint: `ws://homeassistant.local:3334`
+- Tor Hidden Service für Relay-Zugriff ohne Portfreigabe oder separate VPS (v3-Format, z. B. `wss://<56-char-hash>.onion`)
+- Tor läuft im Add-on mit und veröffentlicht den Relay-Port intern als Onion-Service
 - Unterstützte NIPs: NIP-01, NIP-02, NIP-04, NIP-09, NIP-11, NIP-17
 - Rate-Limiting (Events pro Minute pro Pubkey konfigurierbar)
 - Basis-Moderation (gebannte Pubkeys, Wortfilter)
