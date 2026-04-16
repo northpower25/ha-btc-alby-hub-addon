@@ -407,7 +407,7 @@ Add-on Konfiguration:
   node_mode: cloud
   nwc_connection_string: "nostr+walletconnect://..."  ← hier einfügen
   nostr_relay_enabled: true                            ← falls eigenes Relay genutzt wird
-  nostr_relay_tor_enabled: true                        ← Relay via Tor/Onion erreichbar
+  nostr_relay_tor_enabled: true                        ← nur wirksam bei nostr_relay_enabled: true
       │
       ▼
 Add-on starten → Integration einrichten
@@ -1209,7 +1209,7 @@ HA NFC-Automation ausgelöst
 
 - Optional aktivierbares Relay im selben Add-on-Container
 - WebSocket-Endpoint: `ws://homeassistant.local:3334`
-- Tor Hidden Service für Relay-Zugriff ohne Portfreigabe oder separate VPS (`wss://<relay>.onion`)
+- Tor Hidden Service für Relay-Zugriff ohne Portfreigabe oder separate VPS (`wss://<generated-onion-address>.onion`)
 - Tor läuft im Add-on mit und veröffentlicht den Relay-Port intern als Onion-Service
 - Unterstützte NIPs: NIP-01, NIP-02, NIP-04, NIP-09, NIP-11, NIP-17
 - Rate-Limiting (Events pro Minute pro Pubkey konfigurierbar)
