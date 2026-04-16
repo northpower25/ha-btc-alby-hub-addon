@@ -1,0 +1,61 @@
+---
+name: Alby Hub (Bitcoin Lightning)
+version: "1.0.0"
+slug: alby_hub
+description: >
+  Self-custody Bitcoin Lightning Node powered by getAlby Hub.
+  Includes optional NOSTR Relay, NWC (Nostr Wallet Connect) support,
+  and a built-in Home Assistant integration bridge.
+url: "https://github.com/northpower25/ha-btc-lightning-node-addon"
+arch:
+  - aarch64
+  - amd64
+startup: application
+boot: auto
+init: false
+map:
+  - addon_config:rw
+  - ssl:ro
+  - backup:rw
+ports:
+  8080/tcp: 8080   # Alby Hub Web UI
+  3334/tcp: 3334   # NOSTR Relay (optional)
+ports_description:
+  8080/tcp: Alby Hub Web UI & API
+  3334/tcp: NOSTR Relay WebSocket
+ingress: true
+ingress_port: 8080
+ingress_stream: false
+panel_icon: mdi:lightning-bolt
+panel_title: Alby Hub
+options:
+  log_level: info
+  nostr_relay_enabled: false
+  backup_passphrase: ""
+  external_access_enabled: false
+  bitcoin_network: mainnet
+  lnd_rest_url: ""
+  lnd_macaroon_hex: ""
+  lnd_tls_cert: ""
+  node_backend: "LDK"
+schema:
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+  nostr_relay_enabled: bool
+  backup_passphrase: str?
+  external_access_enabled: bool
+  bitcoin_network: list(mainnet|testnet|signet|mutinynet)
+  lnd_rest_url: str?
+  lnd_macaroon_hex: str?
+  lnd_tls_cert: str?
+  node_backend: list(LDK|LND|Cashu|Greenlight|Breez)
+environment:
+  LOG_LEVEL: "{{log_level}}"
+  NOSTR_RELAY_ENABLED: "{{nostr_relay_enabled}}"
+  BACKUP_PASSPHRASE: "{{backup_passphrase}}"
+  EXTERNAL_ACCESS_ENABLED: "{{external_access_enabled}}"
+  BITCOIN_NETWORK: "{{bitcoin_network}}"
+  LND_REST_URL: "{{lnd_rest_url}}"
+  LND_MACAROON_HEX: "{{lnd_macaroon_hex}}"
+  LND_TLS_CERT: "{{lnd_tls_cert}}"
+  NODE_BACKEND: "{{node_backend}}"
+image: "ghcr.io/northpower25/ha-alby-hub/{arch}"
