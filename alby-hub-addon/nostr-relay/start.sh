@@ -15,7 +15,7 @@ if ! echo "${TARGET_WS}" | grep -Eq '^wss?://'; then
   exit 1
 fi
 
-if ! echo "${LISTEN_PORT}" | grep -Eq '^[0-9]+$' || ! ((10#${LISTEN_PORT} >= 1 && 10#${LISTEN_PORT} <= 65535)); then
+if ! echo "${LISTEN_PORT}" | grep -Eq '^[0-9]+$' || [ "${LISTEN_PORT}" -lt 1 ] || [ "${LISTEN_PORT}" -gt 65535 ]; then
   echo "ERROR: LISTEN_PORT must be a number between 1 and 65535"
   exit 1
 fi

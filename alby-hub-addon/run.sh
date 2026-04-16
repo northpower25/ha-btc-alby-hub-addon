@@ -32,17 +32,28 @@ NOSTR_PROXY_PORT_DEFAULT="3334"
 RELAY_CHECK_TIMEOUT_SECONDS="8"
 
 url_decode() {
-    local value="${1//+/ }"
-    value="${value//%3A/:}"
-    value="${value//%3a/:}"
-    value="${value//%2F/\/}"
-    value="${value//%2f/\/}"
-    value="${value//%3F/?}"
-    value="${value//%3f/?}"
-    value="${value//%3D/=}"
-    value="${value//%3d/=}"
-    value="${value//%26/&}"
-    printf '%s' "${value}"
+    local encoded="${1//+/ }"
+    local decoded=""
+    local i=0
+    local len=${#encoded}
+    local c hex char
+
+    while (( i < len )); do
+        c="${encoded:i:1}"
+        if [ "${c}" = "%" ] && (( i + 3 <= len )); then
+            hex="${encoded:i+1:2}"
+            if echo "${hex}" | grep -Eq '^[0-9A-Fa-f]{2}$'; then
+                printf -v char "\\$(printf '%03o' "$((16#${hex}))")"
+                decoded+="${char}"
+                i=$((i + 3))
+                continue
+            fi
+        fi
+        decoded+="${c}"
+        i=$((i + 1))
+    done
+
+    printf '%s' "${decoded}"
 }
 
 extract_nwc_param() {
