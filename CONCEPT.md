@@ -278,6 +278,22 @@ Home Assistant (nur Integration, kein lokaler Hub-Container)
 > Nostr-Schlüssel für die verschlüsselte NWC-Kommunikation. Du siehst davon nichts
 > und musst nichts manuell einrichten.
 
+##### Sonderfall – Du hast bereits einen Alby-Account (ehemals getAlby)
+
+Wenn du bereits einen bestehenden getAlby-/Alby-Hub-Account hast, musst du **keinen neuen Account** erstellen:
+
+1. Direkt auf **[https://albyhub.com](https://albyhub.com)** einloggen.
+2. Prüfen, ob dein Hub bereits vollständig initialisiert ist:
+   - Unlock-Passwort gesetzt
+   - Backup-Phrase sicher gesichert
+   - Lightning Address aktiv (optional, aber empfohlen)
+3. Falls alles vorhanden ist, direkt mit **[Schritt 4 – NWC-Verbindung für Home Assistant erstellen](#schritt-4--nwc-verbindung-für-home-assistant-erstellen)** weitermachen.
+4. Falls noch kein NWC-Zugang für HA existiert:
+   - `Apps` → `Add Connection`
+   - Name: `Home Assistant`
+   - Scopes: `get_info`, `get_balance`, `list_transactions`, `make_invoice` (+ optional `pay_invoice`)
+   - NWC-String kopieren und im Add-on/Config-Flow eintragen
+
 ---
 
 ##### Schritt 2 – Alby Hub beim ersten Start einrichten (Onboarding Wizard)
@@ -625,6 +641,23 @@ Home Assistant Add-on (Alby Hub Container läuft lokal)
         ▼
   Lightning Network  (direkte Peer-Verbindungen)
 ```
+
+#### Für Fortgeschrittene mit bestehender eigener Lightning Node
+
+Wenn du bereits eine eigene Lightning Node betreibst (z.B. LND, CLN oder Phoenixd), ist der empfohlene Ablauf:
+
+1. Add-on auf `node_mode: expert` setzen und starten.
+2. Im lokalen Alby-Hub-UI das passende Backend auswählen (`lnd`, `cln` oder `phoenixd`).
+3. Node-Zugangsdaten hinterlegen:
+   - **LND:** REST-URL + TLS + Admin/Invoice-Macaroon
+   - **CLN:** REST-URL + Rune
+   - **Phoenixd:** lokale API-Zugangsdaten
+4. Verbindung im Hub testen (Info/Balance abrufen).
+5. Danach erst die HA-Integration per NWC verbinden (`Apps` → `Add Connection`).
+6. Für Sicherheit pro Verbindung enge Scopes und ein Ausgabenbudget setzen.
+
+> Empfehlung: Für Automationen einen separaten NWC-Zugang mit limitierter Berechtigung anlegen
+> (z.B. nur `make_invoice`, kein `pay_invoice`), damit mobile/automatische Flows sauber getrennt sind.
 
 #### NWC-String beim lokalen Hub erzeugen
 
@@ -1010,6 +1043,111 @@ Das Lovelace-Dashboard wird automatisch beim ersten Verbinden der Integration an
 │  [+ NFC Blueprint]  [+ Paywall Blueprint]              │
 └─────────────────────────────────────────────────────────┘
 ```
+
+### Praxisbeispiele: HA Integration + Add-on im Alltag nutzen
+
+Beispiele für den direkten Nutzen im Home Assistant:
+
+- **Tür-/Schalter-Freigabe nach Zahlung:** Automation reagiert auf `alby_hub_payment_received` und öffnet z.B. ein Smart Lock.
+- **Spendenmodus im Dashboard:** Besucher scannen einen QR-Code, bezahlen sofort per Lightning.
+- **Pay-per-Use-Geräte:** Waschmaschine, 3D-Drucker oder Ladepunkt startet erst nach erfolgreicher Zahlung.
+- **Companion App als Wallet-Frontend:** Benutzer erstellt in Home Assistant Rechnungen, zeigt QR-Codes an und kann Zahlungen direkt aus der Home Assistant App initiieren; für QR-Scan ist je nach Plattform (iOS/Android) ggf. eine eigene Shortcut/Intent-Integration nötig.
+
+> Damit kann die **Home Assistant Companion App** praktisch als Wallet-Oberfläche genutzt werden:
+> Rechnung erstellen/anzeigen (Empfangen) und Ziel-Rechnungen bzw. Lightning-Adressen eingeben (Bezahlen).
+
+### Lovelace Card Beispiel 1 – Rechnung erstellen (BOLT12 oder klassische Lightning-Rechnung)
+
+```yaml
+type: vertical-stack
+cards:
+  - type: entities
+    title: "⚡ Lightning Rechnung erstellen"
+    show_header_toggle: false
+    entities:
+      - entity: input_number.lightning_amount
+        name: Betrag
+      - entity: input_select.lightning_amount_unit
+        name: Einheit
+      - entity: input_select.lightning_currency
+        name: Fiat-Währung (bei EUR/USD)
+      - entity: input_text.lightning_memo
+        name: Beschreibung
+      - entity: input_select.lightning_invoice_type
+        name: Rechnungstyp
+  - type: button
+    name: Rechnung erzeugen
+    icon: mdi:lightning-bolt
+    tap_action:
+      action: call-service
+      service: script.alby_create_receive_request
+  - type: markdown
+    content: |
+      Ergebnis:
+      - Bei `invoice_type: bolt12_offer` wird ein BOLT12 Offer angezeigt.
+      - Bei `invoice_type: bolt11` wird eine klassische Lightning-Rechnung angezeigt.
+      - `script.alby_create_receive_request` konvertiert bei Bedarf EUR/USD → sat/BTC über den BTC-Preis-Sensor.
+```
+
+Empfohlene Helper-Entities:
+
+- `input_number.lightning_amount`
+- `input_select.lightning_amount_unit` (`EUR`, `USD`, `SAT`, `BTC`)
+- `input_select.lightning_currency` (`EUR`, `USD`)
+- `input_select.lightning_invoice_type` (`bolt12_offer`, `bolt11`)
+- `input_text.lightning_memo`
+
+### Lovelace Card Beispiel 2 – Bezahlen (QR-Scan + Invoice/Lightning Address)
+
+```yaml
+type: vertical-stack
+cards:
+  - type: entities
+    title: "⚡ Lightning bezahlen"
+    show_header_toggle: false
+    entities:
+      - entity: input_text.lightning_payment_target
+        name: Rechnung / Lightning-Adresse / LNURL
+      - entity: input_number.lightning_pay_amount
+        name: Betrag (optional bei Lightning-Adresse)
+      - entity: input_select.lightning_pay_amount_unit
+        name: Einheit (sat/BTC/EUR/USD)
+      - entity: input_select.lightning_pay_currency
+        name: Fiat-Währung
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: QR scannen (Companion App)
+        icon: mdi:qrcode-scan
+        tap_action:
+          action: call-service
+          service: script.alby_scan_qr_to_target
+      - type: button
+        name: Jetzt bezahlen
+        icon: mdi:send
+        tap_action:
+          action: call-service
+          service: script.alby_pay_request
+  - type: markdown
+    content: |
+      `script.alby_pay_request` entscheidet automatisch:
+      - BOLT11-Rechnung → `lightning.send_payment`
+      - Lightning-Adresse/LNURL → `lightning.pay_lnurl` bzw. Address-Resolve + Zahlung
+      - Betrag in EUR/USD wird vor dem Senden in sat/BTC umgerechnet.
+```
+
+#### Hinweis zur Umsetzung der Beispiel-Skripte
+
+Die in den Karten referenzierten Skripte sind **Beispielnamen**, die in der HA-Integration
+als eigene Scripts/Automationen angelegt werden:
+
+- `script.alby_create_receive_request`: Liest Betrag + Einheit, rechnet bei Bedarf (EUR/USD → sat/BTC)
+  und erstellt abhängig von `input_select.lightning_invoice_type` entweder BOLT12 Offer oder BOLT11 Invoice.
+- `script.alby_scan_qr_to_target`: **Konzeptionelles Beispiel** für mobile QR-Erfassung; benötigt eine
+  eigene App-Umsetzung (z.B. App-Aktion/Deep-Link/Intent oder Shortcut), die den Scan-Text als Service-Daten
+  in `input_text.lightning_payment_target` schreibt.
+- `script.alby_pay_request`: Prüft das Ziel-Format (`lnbc...`/`lntb...` = BOLT11, `name@domain` = Lightning Address,
+  `lnurl...` = LNURL) und ruft den passenden Service auf (`lightning.send_payment` oder `lightning.pay_lnurl`).
 
 ---
 
