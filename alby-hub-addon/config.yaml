@@ -8,7 +8,7 @@ description: >
   (kein lokaler Node nötig, Account auf https://albyhub.com erstellen).
   Expert-Mode: betreibt Alby Hub vollständig lokal mit eigenem Lightning-Backend
   (LDK embedded, LND, CLN, Phoenixd). Inkl. optionalem NOSTR Relay.
-url: "https://github.com/northpower25/ha-btc-lightning-node-addon"
+url: "https://github.com/northpower25/ha-btc-alby-hub-addon"
 arch:
   - aarch64
   - amd64
