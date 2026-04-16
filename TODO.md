@@ -32,6 +32,8 @@
 - ✅ Expert-Modus: `AUTO_UNLOCK_PASSWORD` via `hub_unlock_password` konfigurierbar
 - ✅ Expert-Modus: Lokaler NWC-Relay (`ws://localhost:7447/v1`) als primärer Relay
 - ⬜ ⭐ `alby-hub-addon/DOCS.md` – Benutzer-Dokumentation mit NWC-Setup-Anleitung
+- ⬜ ⭐ Add-on-Konfigurationsoberfläche: Für jedes Feld kurze „Warum benötigt?“-Erklärung direkt im UI
+- ⬜ ⭐ Add-on-Setup-Selbsttests: NWC-String-Validierung, Relay/API-Erreichbarkeit, Scope-Prüfung
 - ⬜ `alby-hub-addon/CHANGELOG.md` – Changelog anlegen
 - ⬜ `alby-hub-addon/nostr-relay/start.sh` – NOSTR-Relay-Startskript
 - ⬜ ⭐ GitHub Actions Workflow für automatischen Container-Build (`.github/workflows/build.yml`)
@@ -48,6 +50,7 @@
 - ⬜ ⭐ `custom_components/alby_hub/api.py` – Alby Hub lokale HTTP REST API (Expert-Mode)
 - ⬜ ⭐ `custom_components/alby_hub/coordinator.py` – DataUpdateCoordinator (NWC + REST)
 - ⬜ ⭐ `custom_components/alby_hub/config_flow.py` – Setup-Wizard (NWC-String eingeben + validieren, inkl. Einsteiger-Hilfe-Link)
+- ⬜ ⭐ Config-/Options-Flow UX: Feldbezogene Erklärtexte + klare Handlungsanweisungen bei Fehlern
 - ⬜ ⭐ `custom_components/alby_hub/sensor.py` – Sensoren (Balance, Kanäle, Preise)
 - ⬜ `custom_components/alby_hub/binary_sensor.py` – Node-Online, Synced, NOSTR
 - ⬜ `custom_components/alby_hub/switch.py` – NOSTR Relay, Safe Mode
@@ -61,6 +64,7 @@
 - ⬜ Webhook-Empfänger für HA-Events (`payment_received`, `invoice_paid`, etc.)
 - ⬜ BTC-Preis-Feed (EUR/USD) als Sensor (Quelle: Mempool.space)
 - ⬜ Onboarding-Flow: Automatischer Testschritt nach Setup (1 sat Testzahlung senden/empfangen)
+- ⬜ ⭐ Setup-Diagnosetests im Flow: Verbindungscheck, Berechtigungscheck, optionaler End-to-End-Zahlungstest
 
 ### C) Dashboard
 
@@ -77,6 +81,7 @@
 
 - ⬜ ⭐ `hacs.json` – HACS Repository-Konfiguration
 - ⬜ `repository.json` – Add-on Repository-Konfiguration
+- ⬜ ⭐ HA 2026.x Kompatibilitätsmatrix definieren und in Manifest/README dokumentieren
 - ⬜ ⭐ `README.md` – Projektbeschreibung mit Installationsanleitung
 - ⬜ `LICENSE` – MIT-Lizenz hinzufügen
 - ⬜ `.github/ISSUE_TEMPLATE/bug_report.md` – Bug-Report-Template

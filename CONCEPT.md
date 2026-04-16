@@ -20,12 +20,15 @@
 11. [Umsetzungsphasen](#11-umsetzungsphasen)
 12. [Zusätzliche Feature-Ideen](#12-zusätzliche-feature-ideen)
 13. [Technische Abhängigkeiten](#13-technische-abhängigkeiten)
+14. [Offene Fragen vor Umsetzungsstart](#14-offene-fragen-vor-umsetzungsstart)
 
 ---
 
 ## 1. Projektziel
 
 Das Ziel dieses Projekts ist es, jedem Home-Assistant-Nutzer mit minimalem Aufwand den Einstieg in das **Bitcoin-Lightning-Self-Custody-Ökosystem** zu ermöglichen. Dazu wird [getAlby Hub](https://github.com/getAlby/hub) als Home-Assistant-Add-on verpackt und durch eine tief integrierte HA-Custom-Integration ergänzt.
+
+Das Zielsystem ist **Home Assistant 2026.x**; sowohl Add-on als auch Integration werden auf **HACS-Konformität** und auf Kompatibilität mit den aktuellen HA-Standards ausgerichtet.
 
 ### Kernversprechen
 
@@ -939,6 +942,10 @@ Entities werden angelegt → Dashboard wird automatisch erstellt ✓
 
 > 💡 **Einsteiger-Hilfe im Config Flow:** Für Nutzer ohne NWC-Erfahrung wird
 > eine inline-Anleitung mit direktem Link zu albyhub.com angezeigt.
+>
+> Zusätzlich gilt für alle Setup-Schritte (Add-on + Integration): Jede Eingabe erhält eine kurze
+> **„Warum wird das benötigt?"**-Erklärung direkt im UI, inklusive verständlicher Fehlermeldungen
+> und nächstem konkreten Schritt bei Validierungsfehlern.
 
 ### Entities
 
@@ -1325,6 +1332,21 @@ Ermöglicht `user@homeassistant.local` als NOSTR-Identität im eigenen Heimnetz.
 | Dashboard | Lovelace / YAML | MIT |
 | Blueprints | HA Blueprint YAML | MIT |
 | Container Base | Alpine Linux 3.19 | MIT/GPL |
+
+---
+
+## 14. Offene Fragen vor Umsetzungsstart
+
+| Thema | Offene Frage | Optionen / Klärung |
+|---|---|---|
+| HA 2026.x Zielversion | Welche minimale Zielversion in 2026.x wird offiziell unterstützt? | z.B. 2026.1+ oder 2026.4+ (abhängig von benötigten Core-APIs) |
+| Support-Matrix | Welche Installationsarten werden verbindlich unterstützt? | HA OS / Supervised / Container (und ggf. Einschränkungen dokumentieren) |
+| Setup-Tests (Pflichtgrad) | Welche Tests sind Pflicht vor Abschluss des Setup und welche optional? | Pflicht: Verbindungs-/Scope-Checks; optional: 1-sat Live-Testzahlung |
+| Live-Testzahlung | Soll die 1-sat Testzahlung im Wizard standardmäßig angeboten oder nur optional gezeigt werden? | Standardmäßig optional mit klarer Risiko-/Kosten-Erklärung |
+| Fehlverhalten bei Testfehlern | Darf der Setup trotz Teilfehlern abgeschlossen werden? | Strikter Blocker vs. „mit Warnung fortfahren" je nach Testtyp |
+| Erklärtexte UX | Wie ausführlich sollen Inline-Erklärungen sein? | Kurzmodus (1–2 Sätze) + „Mehr erfahren“-Link |
+| Sprachen im MVP | Welche Sprachen sind zum Start verpflichtend? | Mindestens DE + EN vollständig in Config-/Options-Flow |
+| HACS-Release-Policy | Welche Release-/Versionierungsstrategie wird für HACS verbindlich genutzt? | SemVer + Release Notes + Compatibility-Hinweis pro Release |
 
 ---
 
