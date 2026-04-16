@@ -29,33 +29,20 @@ export PORT=8080
 export LOG_LEVEL="${LOG_LEVEL}"
 NOSTR_PROXY_TARGET_DEFAULT="ws://127.0.0.1:7447/v1"
 NOSTR_PROXY_PORT_DEFAULT="3334"
+RELAY_CHECK_TIMEOUT_SECONDS="8"
 
 url_decode() {
-    local encoded="${1}"
-    local decoded=""
-    local i=0
-    local len=${#encoded}
-    local c hex
-
-    while [ "${i}" -lt "${len}" ]; do
-        c="${encoded:${i}:1}"
-        if [ "${c}" = "%" ] && (( i + 2 < len )); then
-            hex="${encoded:$((i + 1)):2}"
-            if echo "${hex}" | grep -Eq '^[0-9A-Fa-f]{2}$'; then
-                decoded+=$(printf '%b' "\\x${hex}")
-                i=$((i + 3))
-                continue
-            fi
-        elif [ "${c}" = "+" ]; then
-            decoded+=" "
-            i=$((i + 1))
-            continue
-        fi
-        decoded+="${c}"
-        i=$((i + 1))
-    done
-
-    printf '%s' "${decoded}"
+    local value="${1//+/ }"
+    value="${value//%3A/:}"
+    value="${value//%3a/:}"
+    value="${value//%2F/\/}"
+    value="${value//%2f/\/}"
+    value="${value//%3F/?}"
+    value="${value//%3f/?}"
+    value="${value//%3D/=}"
+    value="${value//%3d/=}"
+    value="${value//%26/&}"
+    printf '%s' "${value}"
 }
 
 extract_nwc_param() {
@@ -95,7 +82,7 @@ check_ws_relay_reachability() {
         return 0
     fi
 
-    if timeout 8 websocat -1 "${relay_url}" </dev/null >/dev/null 2>&1; then
+    if timeout "${RELAY_CHECK_TIMEOUT_SECONDS}" websocat -1 "${relay_url}" </dev/null >/dev/null 2>&1; then
         bashio::log.info "Relay reachable: ${relay_url}"
         return 0
     fi
