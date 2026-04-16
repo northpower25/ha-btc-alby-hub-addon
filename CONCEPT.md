@@ -873,7 +873,7 @@ Cookie: session=<session-token>
 node_mode: cloud            # cloud | expert
 log_level: info
 nostr_relay_enabled: false
-nostr_relay_tor_enabled: true
+nostr_relay_tor_enabled: false
 backup_passphrase: ""
 external_access_enabled: false
 
@@ -1209,7 +1209,7 @@ HA NFC-Automation ausgelöst
 
 - Optional aktivierbares Relay im selben Add-on-Container
 - WebSocket-Endpoint: `ws://homeassistant.local:3334`
-- Tor Hidden Service für Relay-Zugriff ohne Portfreigabe oder separate VPS (`wss://<generated-onion-address>.onion`)
+- Tor Hidden Service für Relay-Zugriff ohne Portfreigabe oder separate VPS (`wss://<your-onion-address>.onion`)
 - Tor läuft im Add-on mit und veröffentlicht den Relay-Port intern als Onion-Service
 - Unterstützte NIPs: NIP-01, NIP-02, NIP-04, NIP-09, NIP-11, NIP-17
 - Rate-Limiting (Events pro Minute pro Pubkey konfigurierbar)
