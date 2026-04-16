@@ -66,7 +66,15 @@ extract_nwc_param() {
     [ "${query}" = "${uri}" ] && return 1
 
     local pair k v
-    for pair in ${query//&/ }; do
+    local rest="${query}"
+    while [ -n "${rest}" ]; do
+        pair="${rest%%&*}"
+        if [ "${rest}" = "${pair}" ]; then
+            rest=""
+        else
+            rest="${rest#*&}"
+        fi
+
         k="${pair%%=*}"
         v="${pair#*=}"
         if [ "${k}" = "${key}" ]; then
