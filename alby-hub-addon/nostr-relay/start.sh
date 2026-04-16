@@ -15,8 +15,13 @@ if ! echo "${TARGET_WS}" | grep -Eq '^wss?://'; then
   exit 1
 fi
 
-if ! echo "${LISTEN_PORT}" | grep -Eq '^[0-9]+$' || [ "${LISTEN_PORT}" -lt 1 ] || [ "${LISTEN_PORT}" -gt 65535 ]; then
-  echo "ERROR: LISTEN_PORT must be a number between 1 and 65535"
+if ! echo "${LISTEN_PORT}" | grep -Eq '^[1-9][0-9]*$'; then
+  echo "ERROR: LISTEN_PORT must be a positive number"
+  exit 1
+fi
+
+if [ "${LISTEN_PORT}" -gt 65535 ]; then
+  echo "ERROR: LISTEN_PORT must be <= 65535"
   exit 1
 fi
 
