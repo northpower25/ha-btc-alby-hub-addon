@@ -27,6 +27,80 @@ mkdir -p "${DATA_DIR}/hub" "${DATA_DIR}/nostr" "${DATA_DIR}/backups"
 export WORK_DIR="${DATA_DIR}/hub"
 export PORT=8080
 export LOG_LEVEL="${LOG_LEVEL}"
+NOSTR_PROXY_TARGET_DEFAULT="ws://127.0.0.1:7447/v1"
+NOSTR_PROXY_PORT_DEFAULT="3334"
+RELAY_CHECK_TIMEOUT_SECONDS="8"
+
+url_decode() {
+    local encoded="${1//+/ }"
+    local decoded=""
+    local i=0
+    local len=${#encoded}
+    local c hex char
+
+    while (( i < len )); do
+        c="${encoded:i:1}"
+        if [ "${c}" = "%" ] && (( i + 2 < len )); then
+            hex="${encoded:i+1:2}"
+            if echo "${hex}" | grep -Eq '^[0-9A-Fa-f]{2}$'; then
+                printf -v char "\\x${hex}"
+                decoded+="${char}"
+                i=$((i + 3))
+                continue
+            fi
+        fi
+        decoded+="${c}"
+        i=$((i + 1))
+    done
+
+    printf '%s' "${decoded}"
+}
+
+extract_nwc_param() {
+    local key="${1}"
+    local uri="${2}"
+    local query
+    query="${uri#*\?}"
+    [ "${query}" = "${uri}" ] && return 1
+
+    local pair k v
+    local rest="${query}"
+    while [ -n "${rest}" ]; do
+        pair="${rest%%&*}"
+        if [ "${rest}" = "${pair}" ]; then
+            rest=""
+        else
+            rest="${rest#*&}"
+        fi
+
+        k="${pair%%=*}"
+        v="${pair#*=}"
+        if [ "${k}" = "${key}" ]; then
+            url_decode "${v}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+check_ws_relay_reachability() {
+    local relay_url="${1}"
+    local missing_tools=()
+    command -v timeout >/dev/null 2>&1 || missing_tools+=("timeout")
+    command -v websocat >/dev/null 2>&1 || missing_tools+=("websocat")
+    if [ "${#missing_tools[@]}" -gt 0 ]; then
+        bashio::log.warning "Relay check skipped: missing ${missing_tools[*]}. Relay connectivity cannot be verified."
+        return 0
+    fi
+
+    if timeout "${RELAY_CHECK_TIMEOUT_SECONDS}" websocat -1 "${relay_url}" </dev/null >/dev/null 2>&1; then
+        bashio::log.info "Relay reachable: ${relay_url}"
+        return 0
+    fi
+
+    bashio::log.warning "Relay not reachable right now: ${relay_url}"
+    return 1
+}
 
 # Bind to all interfaces only when external access is requested
 if bashio::var.true "${EXTERNAL_ACCESS_ENABLED}"; then
@@ -81,6 +155,21 @@ if [ "${NODE_MODE}" = "cloud" ]; then
         bashio::log.error "Example: nostr+walletconnect://<pubkey>?relay=wss://relay.getalby.com/v1&secret=<secret>"
         exit 1
     fi
+
+    bashio::log.info "Running cloud-mode setup self-tests..."
+    NWC_RELAY=$(extract_nwc_param "relay" "${NWC_CONNECTION_STRING}" || true)
+    NWC_SECRET=$(extract_nwc_param "secret" "${NWC_CONNECTION_STRING}" || true)
+
+    if [ -z "${NWC_RELAY}" ]; then
+        bashio::log.error "Invalid nwc_connection_string: missing required 'relay' query parameter."
+        exit 1
+    fi
+    if [ -z "${NWC_SECRET}" ]; then
+        bashio::log.error "Invalid nwc_connection_string: missing required 'secret' query parameter."
+        exit 1
+    fi
+    check_ws_relay_reachability "${NWC_RELAY}" || true
+    bashio::log.info "Scope check info: NWC scopes are managed in Alby Hub and validated later in the HA integration setup flow."
 
     # Export for HA integration to pick up via the supervisor API
     export NWC_CONNECTION_STRING="${NWC_CONNECTION_STRING}"
@@ -176,12 +265,6 @@ elif [ "${NODE_MODE}" = "expert" ]; then
     # Use local Nostr relay for NWC (avoids cloud relay dependency)
     export RELAY="ws://localhost:7447/v1,wss://relay.getalby.com/v1"
 
-    # ── Optional NOSTR relay ──
-    if bashio::var.true "${NOSTR_RELAY_ENABLED}"; then
-        bashio::log.info "Starting NOSTR relay on port 3334..."
-        NOSTR_DATA_DIR="${DATA_DIR}/nostr" /opt/nostr-relay/start.sh &
-    fi
-
     # ── Wait-for-API helper ──
     wait_for_hub() {
         local retries=30
@@ -204,6 +287,13 @@ elif [ "${NODE_MODE}" = "expert" ]; then
     HUB_PID=$!
 
     wait_for_hub
+
+    # ── Optional NOSTR relay ──
+    if bashio::var.true "${NOSTR_RELAY_ENABLED}"; then
+        bashio::log.info "Starting NOSTR relay proxy on port ${NOSTR_PROXY_PORT_DEFAULT}..."
+        NOSTR_DATA_DIR="${DATA_DIR}/nostr" /opt/nostr-relay/start.sh "${NOSTR_PROXY_TARGET_DEFAULT}" "${NOSTR_PROXY_PORT_DEFAULT}" &
+        check_ws_relay_reachability "ws://127.0.0.1:${NOSTR_PROXY_PORT_DEFAULT}" || true
+    fi
 
     bashio::log.info "Alby Hub is running (PID ${HUB_PID})"
     bashio::log.info "Web UI available at: http://homeassistant.local:8080 (or via HA Ingress)"
