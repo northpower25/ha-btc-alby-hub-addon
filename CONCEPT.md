@@ -103,63 +103,279 @@ alby-hub-addon/
 
 ## 4. Betriebsmodi
 
-Das Add-on unterstützt zwei klar getrennte Betriebsmodi, die im Setup-Wizard ausgewählt werden:
+Das Add-on unterstützt zwei klar getrennte Betriebsmodi, die beim ersten Start ausgewählt werden.
 
-### Modus 1: Cloud-Modus (Einsteiger – ohne eigene Node)
+> **Wichtiger Hinweis zur Terminologie:** Alby Hub verwendet als primäres API-Protokoll
+> **NWC (Nostr Wallet Connect)** – keinen klassischen REST-API-Key. Der "API-Schlüssel"
+> ist ein **NWC-Connection-String** (URI-Format: `nostr+walletconnect://…`), der im
+> Alby Hub Web UI unter **Apps → Neue Verbindung** erzeugt wird.
+
+---
+
+### Modus 1: Cloud-Modus – Externer Hub via NWC (Einsteiger)
+
+In diesem Modus läuft **kein eigener Lightning-Node** auf dem HA-Server. Der Nutzer
+verfügt bereits über einen Alby Hub (gehostet auf [albyhub.com](https://albyhub.com)
+oder einem eigenen Server) und verbindet das HA-Add-on über eine NWC-Verbindung.
 
 ```
-HA Add-on (Alby Hub Container)
+Home Assistant (nur Integration, kein lokaler Hub-Container)
         │
-        │  HTTPS/OAuth2
+        │  NWC (Nostr Wallet Connect) via WebSocket-Relay
         ▼
-  getAlby Cloud API  ◄──── Treuhänderisch bei Alby gehostet
+  Alby Hub (extern)
+  ┌──────────────────────────────────────────┐
+  │  albyhub.com (gehosted von Alby)         │  ← Einsteiger
+  │  ODER eigener Server / Homelab-Hub       │  ← Fortgeschrittene
+  └──────────────────────────────────────────┘
         │
         ▼
   Lightning Network
 ```
 
-- **Voraussetzung:** Alby-Account (kostenlos)
-- **Vorteile:** Kein Channel-Management, sofort einsatzbereit, kein eigenes Kapital nötig
-- **Nachteile:** Nicht vollständig self-custodial (Alby hält Schlüssel)
-- **Konfiguration:** `node_mode: cloud`, Alby API-Key aus Account-Einstellungen
-- **Geeignet für:** Einsteiger, Test-Setups, Nutzer ohne dedizierte Hardware
-
-### Modus 2: Expert-Modus (eigene Node – vollständige Self-Custody)
+#### Schritt-für-Schritt: Account & NWC-String bei albyhub.com
 
 ```
-HA Add-on (Alby Hub Container)
+1. Browser öffnen → https://albyhub.com
         │
-        │  Lokale Verbindung
         ▼
-  Lightning Backend
-  ┌─────────────────┐
-  │  LDK (embedded) │ ← Standard, keine externe Node nötig
-  │  LND (extern)   │ ← eigene LND-Node via REST+Macaroon
-  │  Breez SDK      │ ← Breez-Service-Node
-  │  Greenlight     │ ← Blockstream Greenlight
-  │  CLN (Core LN)  │ ← Core Lightning via REST
-  └─────────────────┘
+2. „Get Alby Hub" → Account erstellen
+   (E-Mail + Passwort ODER GitHub/Google Sign-In)
+        │
+        ▼
+3. Hub wird automatisch provisioniert (Alby Cloud-Infrastruktur)
+   Erster Start dauert ca. 1–2 Minuten
+        │
+        ▼
+4. Hub-Dashboard öffnet sich → „Apps" im linken Menü klicken
+        │
+        ▼
+5. „Add Connection" → App-Name eintragen z.B. „Home Assistant"
+   Berechtigungen wählen:
+     ✓ get_info          ← Pflicht (Status-Monitoring)
+     ✓ get_balance       ← Pflicht (Balance-Sensor)
+     ✓ list_transactions ← Pflicht (Zahlungshistorie)
+     ✓ make_invoice      ← Für Invoice-Service
+     ✓ pay_invoice       ← Für Payment-Service (nur Full Access!)
+   Optional: Budget-Limit (z.B. 10.000 sat/Monat) setzen
+        │
+        ▼
+6. QR-Code + Connection-String wird angezeigt:
+   nostr+walletconnect://<wallet-pubkey>?relay=wss://relay.getalby.com/v1&secret=<geheimnis>
+        │
+        ▼
+7. Diesen String als „nwc_connection_string" im HA-Add-on eintragen
+```
+
+- **Voraussetzung:** Account auf [albyhub.com](https://albyhub.com) (kostenlos für Basisplan)
+- **Vorteile:** Kein Channel-Management, keine Hardware, sofort einsatzbereit
+- **Nachteile:** Nicht vollständig self-custodial bei albyhub.com (Alby hält Infrastruktur)
+- **Geeignet für:** Einsteiger, Test-Setups, Nutzer ohne dedizierte Hardware
+
+> **Datenschutz-Hinweis:** Beim Cloud-Modus mit albyhub.com verarbeitet Alby Transaktionsdaten.
+> Für vollständige Privatsphäre → Expert-Modus mit eigenem LDK/LND wählen.
+
+---
+
+### Modus 2: Expert-Modus – Lokaler Hub mit eigener Node (vollständige Self-Custody)
+
+In diesem Modus läuft **Alby Hub vollständig lokal** im HA-Add-on-Container. Der Nutzer
+hat die Wahl des Lightning-Backends.
+
+```
+Home Assistant Add-on (Alby Hub Container läuft lokal)
+        │
+        │  NWC lokal ODER direkte lokale HTTP-API
+        ▼
+  Lightning Backend (lokal auf dem HA-Host)
+  ┌─────────────────────────────────────────┐
+  │  LDK (embedded) ← Standard, empfohlen  │  kein Extra-Setup
+  │  LND (extern)   ← eigene LND-Node      │  REST + Macaroon
+  │  CLN (Core LN)  ← eigene CLN-Node      │  REST + Rune
+  │  Phoenixd       ← Phoenix-Node         │  lokale API
+  │  Cashu          ← Cashu Ecash Mint     │  experimentell
+  └─────────────────────────────────────────┘
         │
         ▼
   Lightning Network  (direkte Peer-Verbindungen)
 ```
 
-- **Voraussetzung:** Laufende Lightning-Node oder LDK (embedded, kein Extra-Setup)
-- **Vorteile:** Vollständige Self-Custody, keine Drittpartei, maximale Kontrolle
-- **Nachteile:** Channel-Management erforderlich, On-chain-Kapital notwendig
-- **Konfiguration:** `node_mode: expert`, Backend-Typ + Verbindungsdetails
+#### NWC-String beim lokalen Hub erzeugen
+
+Der Ablauf ist identisch zum Cloud-Modus, aber das Hub-Dashboard ist unter
+`http://homeassistant.local:8080` (oder via HA-Ingress) erreichbar:
+
+```
+1. HA-Ingress-Panel „Alby Hub" öffnen  →  http://homeassistant.local:8080
+        │
+        ▼
+2. Alby Hub mit Unlock-Passwort entsperren (beim Erststart setzen)
+        │
+        ▼
+3. „Apps" → „Add Connection" → Name: „HA Integration"
+   Berechtigungen + optionales Budget setzen
+        │
+        ▼
+4. NWC-Connection-String kopieren:
+   nostr+walletconnect://<lokale-pubkey>?relay=ws://localhost:7447/v1&secret=<geheimnis>
+   ODER mit dem Alby-Cloud-Relay:
+   nostr+walletconnect://<pubkey>?relay=wss://relay.getalby.com/v1&secret=<geheimnis>
+        │
+        ▼
+5. String als „nwc_connection_string" im HA-Integration-Config-Flow eintragen
+```
+
+- **Voraussetzung:** Laufende Lightning-Node oder LDK (embedded – kein Extra-Setup)
+- **Vorteile:** Vollständige Self-Custody, alle Daten lokal, keine Drittpartei
+- **Nachteile:** Channel-Management erforderlich, On-chain-Kapital für LN-Channels nötig
 - **Geeignet für:** Fortgeschrittene, Selbst-Hoster, Nutzer mit eigener Node
+
+---
 
 ### Modus-Vergleichstabelle
 
-| Eigenschaft | Cloud-Modus | Expert-Modus |
+| Eigenschaft | Cloud-Modus (albyhub.com) | Expert-Modus (lokal) |
 |---|---|---|
-| Self-Custody | ❌ (Alby treuhänderisch) | ✅ vollständig |
-| Setup-Aufwand | ⭐ minimal | ⭐⭐⭐ mittel-hoch |
-| Channel-Management | automatisch | manuell |
-| Kapital erforderlich | nein | ja (für Channels) |
+| Self-Custody | ❌ (Alby Infrastruktur) | ✅ vollständig |
+| Setup-Aufwand | ⭐ minimal (5 Min) | ⭐⭐⭐ mittel-hoch |
+| Channel-Management | automatisch von Alby | manuell |
+| Kapital erforderlich | nein | ja (für LN-Channels) |
 | Offline-Betrieb | eingeschränkt | vollständig |
-| Empfehlung | Einsteiger | Fortgeschrittene |
+| Datenschutz | eingeschränkt | vollständig |
+| HA-Hardware-Anforderungen | minimal | mittel (mind. 4 GB RAM) |
+| Empfehlung | Einsteiger / Testen | Fortgeschrittene |
+
+---
+
+### 4a. NWC – Nostr Wallet Connect: Technischer Hintergrund
+
+NWC ist das primäre API-Protokoll von Alby Hub. Es ist ein offenes Protokoll
+([nwc.dev](https://nwc.dev)) zum sicheren Steuern von Lightning-Wallets.
+
+#### NWC Connection String – Aufbau
+
+```
+nostr+walletconnect://<wallet-pubkey>
+  ?relay=wss://relay.getalby.com/v1
+  &secret=<client-secret-hex>
+  &lud16=user@albyhub.com        ← optional: Lightning Address
+```
+
+| Bestandteil | Bedeutung |
+|---|---|
+| `wallet-pubkey` | Nostr-Public-Key des Alby Hub (Empfänger) |
+| `relay` | WebSocket-Relay-URL für die NWC-Kommunikation |
+| `secret` | Geheimer Schlüssel des HA-Clients (32 Byte hex) |
+| `lud16` | Optional: Lightning Address des Wallets |
+
+#### NWC-Berechtigungs-Scopes
+
+Beim Erzeugen des NWC-Connection-Strings lassen sich Berechtigungen granular setzen:
+
+| Scope | Beschreibung | Benötigt für |
+|---|---|---|
+| `get_info` | Node-Infos abrufen | Status-Sensoren |
+| `get_balance` | Wallet-Guthaben abrufen | Balance-Sensoren |
+| `list_transactions` | Zahlungshistorie abrufen | Payment-Sensoren |
+| `make_invoice` | BOLT11-Rechnungen erstellen | `lightning.create_invoice` |
+| `pay_invoice` | BOLT11-Rechnungen bezahlen | `lightning.send_payment` |
+| `lookup_invoice` | Rechnungsstatus abfragen | Invoice-Tracking |
+| `get_budget` | Budget-Limits abfragen | Safe-Mode-Überwachung |
+| `sign_message` | Nachrichten signieren | Authentifizierung |
+
+#### NWC-Protokoll: Request/Response-Ablauf
+
+```
+HA Integration (NWC Client)              Alby Hub (NWC Server)
+        │                                        │
+        │  1. Verschlüsselte Nostr-Nachricht      │
+        │     (NIP-04 Encryption)                │
+        │─────────────────────────────────────► │
+        │     Event Kind: 23194                  │
+        │                                        │
+        │  2. Hub verarbeitet Request            │
+        │                                        │
+        │  3. Verschlüsselte Antwort             │
+        │◄──────────────────────────────────── │
+        │     Event Kind: 23195                  │
+        │                                        │
+```
+
+**Alle NWC-Requests laufen über das Nostr-Relay** (WebSocket).
+Bei lokalem Hub kann `ws://localhost:7447/v1` als Relay verwendet werden
+(integrierter lokaler Relay im Alby Hub), um Internet-Unabhängigkeit zu erreichen.
+
+---
+
+### 4b. Lokale HTTP REST API (nur Expert-Modus / lokaler Hub)
+
+Zusätzlich zu NWC bietet der lokale Alby Hub eine **direkte REST API** am Port 8080.
+Diese ermöglicht der HA-Integration schnellere Abfragen ohne Nostr-Relay-Latenz.
+
+**Authentifizierung:** Session-basiert (Unlock-Passwort beim Erststart gesetzt).
+Für automatisierte Abfragen sollte über die REST API eine App-Session erzeugt werden.
+
+#### Wichtige REST-Endpoints
+
+| Methode | Endpoint | Beschreibung |
+|---|---|---|
+| `GET` | `/api/info` | Node-Info (Pubkey, Version, Backend-Typ) |
+| `GET` | `/api/wallet/balance` | Wallet-Balance (Lightning + On-Chain) |
+| `GET` | `/api/transactions` | Zahlungshistorie |
+| `POST` | `/api/invoices` | BOLT11-Invoice erstellen |
+| `POST` | `/api/payments` | Invoice bezahlen |
+| `GET` | `/api/apps` | Verbundene Apps auflisten |
+| `POST` | `/api/apps` | Neue NWC-App/Verbindung erstellen |
+| `GET` | `/api/channels` | Lightning-Kanäle |
+| `GET` | `/api/peers` | Verbundene Peers |
+| `GET` | `/api/health` | Health-Check (kein Auth nötig) |
+
+#### Beispiel: Invoice erstellen
+
+```http
+POST http://localhost:8080/api/invoices
+Content-Type: application/json
+Cookie: session=<session-token>
+
+{
+  "amount": 1000,
+  "description": "Kaffeezahlung",
+  "expiry": 3600
+}
+```
+
+**Response:**
+```json
+{
+  "payment_request": "lnbc10n1pj...",
+  "payment_hash": "abc123...",
+  "expires_at": "2026-04-16T16:00:00Z"
+}
+```
+
+#### Beispiel: Payment senden
+
+```http
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+Cookie: session=<session-token>
+
+{
+  "invoice": "lnbc10n1pj...",
+  "amount": 1000
+}
+```
+
+**Response:**
+```json
+{
+  "payment_hash": "abc123...",
+  "fee": 1,
+  "preimage": "def456..."
+}
+```
+
+---
 
 ### Konfigurationsoptionen (Add-on)
 
@@ -171,12 +387,19 @@ nostr_relay_enabled: false
 backup_passphrase: ""
 external_access_enabled: false
 
-# Cloud-Modus
-alby_api_key: ""            # API-Key aus alby.com/account
+# ── Cloud-Modus (NWC Connection String von albyhub.com) ────────────
+# 1. Account erstellen: https://albyhub.com
+# 2. Hub-Dashboard → Apps → Add Connection → Berechtigungen setzen
+# 3. NWC-String kopieren und hier eintragen
+nwc_connection_string: ""   # nostr+walletconnect://...
 
-# Expert-Modus
+# ── Expert-Modus (lokaler Alby Hub) ────────────────────────────────
+# Der NWC-String wird nach dem ersten Start im lokalen Hub-Dashboard
+# (http://homeassistant.local:8080 / HA-Ingress) erzeugt.
+# Zusätzlich wird die lokale HTTP-API direkt genutzt.
 bitcoin_network: mainnet    # mainnet | testnet | signet | mutinynet
-node_backend: LDK           # LDK | LND | CLN | Breez | Greenlight
+node_backend: LDK           # LDK | LND | CLN | Phoenixd | Cashu
+hub_unlock_password: ""     # Wird beim Erststart im Hub gesetzt
 lnd_rest_url: ""
 lnd_macaroon_hex: ""
 lnd_tls_cert: ""

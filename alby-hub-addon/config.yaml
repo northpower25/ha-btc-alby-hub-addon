@@ -3,11 +3,11 @@ name: Alby Hub (Bitcoin Lightning)
 version: "1.0.0"
 slug: alby_hub
 description: >
-  Self-custody Bitcoin Lightning Node powered by getAlby Hub.
-  Supports Cloud-Mode (getAlby account, no own node required) and
-  Expert-Mode (own node: LDK embedded, LND, CLN, Breez, Greenlight).
-  Includes optional NOSTR Relay, NWC (Nostr Wallet Connect) support,
-  and a built-in Home Assistant integration bridge.
+  Self-custody Bitcoin Lightning Node powered by Alby Hub.
+  Cloud-Mode: verbindet sich mit externem Alby Hub via NWC Connection String
+  (kein lokaler Node nötig, Account auf https://albyhub.com erstellen).
+  Expert-Mode: betreibt Alby Hub vollständig lokal mit eigenem Lightning-Backend
+  (LDK embedded, LND, CLN, Phoenixd). Inkl. optionalem NOSTR Relay.
 url: "https://github.com/northpower25/ha-btc-lightning-node-addon"
 arch:
   - aarch64
@@ -20,10 +20,10 @@ map:
   - ssl:ro
   - backup:rw
 ports:
-  8080/tcp: 8080   # Alby Hub Web UI
+  8080/tcp: 8080   # Alby Hub Web UI (Expert-Mode only)
   3334/tcp: 3334   # NOSTR Relay (optional)
 ports_description:
-  8080/tcp: Alby Hub Web UI & API
+  8080/tcp: Alby Hub Web UI & API (nur Expert-Modus)
   3334/tcp: NOSTR Relay WebSocket
 ingress: true
 ingress_port: 8080
@@ -31,34 +31,50 @@ ingress_stream: false
 panel_icon: mdi:lightning-bolt
 panel_title: Alby Hub
 options:
-  # ── Mode Selection ─────────────────────────────────────────────────────────
-  # "cloud"  → Use getAlby cloud account (no own node, quick start, non-custodial via Alby)
-  # "expert" → Run your own Lightning node (full self-custody, LDK/LND/CLN/Breez/Greenlight)
+  # ── Modus-Auswahl ──────────────────────────────────────────────────────────
+  # "cloud"  → Kein lokaler Node. NWC-String von albyhub.com oder externem Hub.
+  #            Account erstellen: https://albyhub.com
+  #            Hub-Dashboard → Apps → Add Connection → NWC-String kopieren
+  # "expert" → Lokaler Alby Hub mit eigenem Lightning-Backend (LDK/LND/CLN/…)
   node_mode: "cloud"
 
-  # ── General ───────────────────────────────────────────────────────────────
+  # ── Allgemein ──────────────────────────────────────────────────────────────
   log_level: info
   nostr_relay_enabled: false
   backup_passphrase: ""
   external_access_enabled: false
 
-  # ── Cloud Mode: getAlby account settings ──────────────────────────────────
-  # Obtain your API key at: https://www.getalby.com/account
-  alby_api_key: ""
+  # ── Cloud-Modus: NWC Connection String ────────────────────────────────────
+  # Woher bekomme ich meinen NWC-String?
+  #   1. https://albyhub.com → Account erstellen / einloggen
+  #   2. Hub-Dashboard → linkes Menü „Apps" → „Add Connection"
+  #   3. App-Name z.B. „Home Assistant" eingeben
+  #   4. Berechtigungen wählen (get_info, get_balance, list_transactions,
+  #      make_invoice, pay_invoice)
+  #   5. NWC-String kopieren: nostr+walletconnect://...
+  nwc_connection_string: ""
 
-  # ── Expert Mode: Lightning backend & network ──────────────────────────────
+  # ── Expert-Modus: Lightning-Backend & Netzwerk ────────────────────────────
   bitcoin_network: mainnet
-  # Supported backends: LDK (embedded, default), LND, CLN, Breez, Greenlight
+  # LDK: embedded, kein externer Node nötig (Standard/Empfehlung)
+  # LND: eigene LND-Node (lnd_rest_url + lnd_macaroon_hex erforderlich)
+  # CLN: Core Lightning (cln_rest_url + cln_rune erforderlich)
+  # Phoenixd: Phoenix-Node (phoenixd_url + phoenixd_password erforderlich)
   node_backend: "LDK"
+  hub_unlock_password: ""
 
-  # LND backend settings (only required when node_backend = LND)
+  # LND-Backend (nur bei node_backend = LND)
   lnd_rest_url: ""
   lnd_macaroon_hex: ""
   lnd_tls_cert: ""
 
-  # CLN (Core Lightning) backend settings (only required when node_backend = CLN)
+  # CLN-Backend (nur bei node_backend = CLN)
   cln_rest_url: ""
   cln_rune: ""
+
+  # Phoenixd-Backend (nur bei node_backend = Phoenixd)
+  phoenixd_url: ""
+  phoenixd_password: ""
 
 schema:
   node_mode: list(cloud|expert)
@@ -66,26 +82,32 @@ schema:
   nostr_relay_enabled: bool
   backup_passphrase: str?
   external_access_enabled: bool
-  alby_api_key: str?
+  nwc_connection_string: str?
   bitcoin_network: list(mainnet|testnet|signet|mutinynet)
-  node_backend: list(LDK|LND|CLN|Breez|Greenlight)
+  node_backend: list(LDK|LND|CLN|Phoenixd|Cashu)
+  hub_unlock_password: str?
   lnd_rest_url: str?
   lnd_macaroon_hex: str?
   lnd_tls_cert: str?
   cln_rest_url: str?
   cln_rune: str?
+  phoenixd_url: str?
+  phoenixd_password: str?
 environment:
   NODE_MODE: "{{node_mode}}"
   LOG_LEVEL: "{{log_level}}"
   NOSTR_RELAY_ENABLED: "{{nostr_relay_enabled}}"
   BACKUP_PASSPHRASE: "{{backup_passphrase}}"
   EXTERNAL_ACCESS_ENABLED: "{{external_access_enabled}}"
-  ALBY_API_KEY: "{{alby_api_key}}"
+  NWC_CONNECTION_STRING: "{{nwc_connection_string}}"
   BITCOIN_NETWORK: "{{bitcoin_network}}"
   NODE_BACKEND: "{{node_backend}}"
+  HUB_UNLOCK_PASSWORD: "{{hub_unlock_password}}"
   LND_REST_URL: "{{lnd_rest_url}}"
   LND_MACAROON_HEX: "{{lnd_macaroon_hex}}"
   LND_TLS_CERT: "{{lnd_tls_cert}}"
   CLN_REST_URL: "{{cln_rest_url}}"
   CLN_RUNE: "{{cln_rune}}"
+  PHOENIXD_URL: "{{phoenixd_url}}"
+  PHOENIXD_PASSWORD: "{{phoenixd_password}}"
 image: "ghcr.io/northpower25/ha-alby-hub/{arch}"

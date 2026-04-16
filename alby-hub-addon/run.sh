@@ -43,38 +43,92 @@ if [ -n "${BACKUP_PASSPHRASE}" ]; then
 fi
 
 # ──────────────────────────────────────────────
-# Mode: CLOUD (getAlby account, no own node)
+# Mode: CLOUD – Externer Hub via NWC Connection String
+#
+# Kein lokaler Lightning-Node. Das Add-on verbindet sich über
+# Nostr Wallet Connect (NWC) mit einem externen Alby Hub.
+#
+# NWC-String bekommt man so:
+#   1. Account erstellen: https://albyhub.com
+#   2. Hub-Dashboard → Apps → "Add Connection"
+#   3. Berechtigungen wählen (get_info, get_balance, make_invoice, pay_invoice, …)
+#   4. Generierten NWC-String (nostr+walletconnect://...) kopieren
+#   5. String als "nwc_connection_string" in den Add-on-Optionen eintragen
 # ──────────────────────────────────────────────
 if [ "${NODE_MODE}" = "cloud" ]; then
-    bashio::log.info "Running in CLOUD MODE (getAlby account)"
-    bashio::log.info "  → No own Lightning node required."
-    bashio::log.info "  → Funds are held with getAlby (non-self-custodial)."
+    bashio::log.info "Running in CLOUD MODE (external Alby Hub via NWC)"
+    bashio::log.info "  → No local Lightning node is started."
+    bashio::log.info "  → The HA integration communicates via the NWC connection string."
 
-    ALBY_API_KEY=$(bashio::config 'alby_api_key')
-    if [ -z "${ALBY_API_KEY}" ]; then
-        bashio::log.error "Cloud mode requires 'alby_api_key' to be set!"
-        bashio::log.error "Get your API key at: https://www.getalby.com/account"
+    NWC_CONNECTION_STRING=$(bashio::config 'nwc_connection_string')
+    if [ -z "${NWC_CONNECTION_STRING}" ]; then
+        bashio::log.error "Cloud mode requires 'nwc_connection_string' to be configured!"
+        bashio::log.error ""
+        bashio::log.error "How to get your NWC connection string:"
+        bashio::log.error "  1. Go to https://albyhub.com and create/log in to your account"
+        bashio::log.error "  2. Open your Hub dashboard → 'Apps' in the left menu"
+        bashio::log.error "  3. Click 'Add Connection', enter name e.g. 'Home Assistant'"
+        bashio::log.error "  4. Select permissions: get_info, get_balance, list_transactions,"
+        bashio::log.error "     make_invoice, pay_invoice (adjust as needed)"
+        bashio::log.error "  5. Copy the connection string: nostr+walletconnect://..."
+        bashio::log.error "  6. Paste it into the 'nwc_connection_string' add-on option"
         exit 1
     fi
 
-    export LN_BACKEND_TYPE="AlbyHub"
-    export ALBY_OAUTH_TOKEN="${ALBY_API_KEY}"
+    # Validate NWC URI scheme
+    if ! echo "${NWC_CONNECTION_STRING}" | grep -q "^nostr+walletconnect://"; then
+        bashio::log.error "Invalid nwc_connection_string: must start with 'nostr+walletconnect://'"
+        bashio::log.error "Example: nostr+walletconnect://<pubkey>?relay=wss://relay.getalby.com/v1&secret=<secret>"
+        exit 1
+    fi
+
+    # Export for HA integration to pick up via the supervisor API
+    export NWC_CONNECTION_STRING="${NWC_CONNECTION_STRING}"
+
+    bashio::log.info "NWC connection string is configured."
+    bashio::log.info "The HA integration will use this string to connect to your hub."
+
+    # In cloud mode no local hub process runs.
+    # The add-on container stays alive to serve as a configuration/secrets store
+    # and to forward the NWC string to the HA integration via the supervisor options API.
+    bashio::log.info "Cloud mode: add-on container running as NWC bridge (no local Hub process)."
+    while true; do sleep 60; done
 
 # ──────────────────────────────────────────────
-# Mode: EXPERT (own node – full self-custody)
+# Mode: EXPERT – Lokaler Alby Hub mit eigenem Node
+#
+# Alby Hub läuft vollständig lokal auf dem HA-Host.
+# Das Web-UI ist über HA-Ingress oder localhost:8080 erreichbar.
+#
+# Ersten NWC-String für die HA-Integration so erzeugen:
+#   1. HA-Panel "Alby Hub" öffnen (Ingress) oder http://homeassistant.local:8080
+#   2. Unlock-Passwort setzen (Erststart)
+#   3. Apps → "Add Connection" → Name: "HA Integration"
+#   4. NWC-String kopieren und in der HA-Integration eintragen
 # ──────────────────────────────────────────────
 elif [ "${NODE_MODE}" = "expert" ]; then
     NODE_BACKEND=$(bashio::config 'node_backend')
     BITCOIN_NETWORK=$(bashio::config 'bitcoin_network')
+    HUB_UNLOCK_PASSWORD=$(bashio::config 'hub_unlock_password')
 
-    bashio::log.info "Running in EXPERT MODE (own Lightning node)"
+    bashio::log.info "Running in EXPERT MODE (local Alby Hub)"
     bashio::log.info "  Backend   : ${NODE_BACKEND}"
     bashio::log.info "  Network   : ${BITCOIN_NETWORK}"
 
     export BITCOIN_NETWORK="${BITCOIN_NETWORK}"
     export LN_BACKEND_TYPE="${NODE_BACKEND}"
+    export NETWORK="${BITCOIN_NETWORK}"
+
+    # Auto-unlock on restart if password is set
+    if [ -n "${HUB_UNLOCK_PASSWORD}" ]; then
+        export AUTO_UNLOCK_PASSWORD="${HUB_UNLOCK_PASSWORD}"
+        bashio::log.info "Auto-unlock is ENABLED (hub will unlock automatically on start)"
+    fi
 
     case "${NODE_BACKEND}" in
+      LDK)
+        bashio::log.info "  Using embedded LDK backend (no external node required)."
+        ;;
       LND)
         LND_REST_URL=$(bashio::config 'lnd_rest_url')
         LND_MACAROON_HEX=$(bashio::config 'lnd_macaroon_hex')
@@ -99,14 +153,19 @@ elif [ "${NODE_MODE}" = "expert" ]; then
         export CLN_RUNE="${CLN_RUNE}"
         bashio::log.info "  CLN URL   : ${CLN_REST_URL}"
         ;;
-      LDK)
-        bashio::log.info "  Using embedded LDK backend (no external node required)."
+      Phoenixd)
+        PHOENIXD_URL=$(bashio::config 'phoenixd_url')
+        PHOENIXD_PASSWORD=$(bashio::config 'phoenixd_password')
+        if [ -z "${PHOENIXD_URL}" ] || [ -z "${PHOENIXD_PASSWORD}" ]; then
+            bashio::log.error "Phoenixd backend requires 'phoenixd_url' and 'phoenixd_password'!"
+            exit 1
+        fi
+        export PHOENIXD_ADDRESS="${PHOENIXD_URL}"
+        export PHOENIXD_API_PASSWORD="${PHOENIXD_PASSWORD}"
+        bashio::log.info "  Phoenixd  : ${PHOENIXD_URL}"
         ;;
-      Breez)
-        bashio::log.info "  Using Breez SDK backend."
-        ;;
-      Greenlight)
-        bashio::log.info "  Using Blockstream Greenlight backend."
+      Cashu)
+        bashio::log.info "  Using Cashu Ecash backend (experimental)."
         ;;
       *)
         bashio::log.error "Unknown node_backend: '${NODE_BACKEND}'"
@@ -114,47 +173,46 @@ elif [ "${NODE_MODE}" = "expert" ]; then
         ;;
     esac
 
+    # Use local Nostr relay for NWC (avoids cloud relay dependency)
+    export RELAY="ws://localhost:7447/v1,wss://relay.getalby.com/v1"
+
+    # ── Optional NOSTR relay ──
+    if bashio::var.true "${NOSTR_RELAY_ENABLED}"; then
+        bashio::log.info "Starting NOSTR relay on port 3334..."
+        NOSTR_DATA_DIR="${DATA_DIR}/nostr" /opt/nostr-relay/start.sh &
+    fi
+
+    # ── Wait-for-API helper ──
+    wait_for_hub() {
+        local retries=30
+        local i=0
+        while [ $i -lt $retries ]; do
+            if curl -sf "http://localhost:8080/api/health" >/dev/null 2>&1; then
+                bashio::log.info "Alby Hub API is ready."
+                return 0
+            fi
+            i=$((i + 1))
+            sleep 2
+        done
+        bashio::log.error "Alby Hub did not become ready within 60 seconds."
+        return 1
+    }
+
+    # ── Start Alby Hub ──
+    bashio::log.info "Launching Alby Hub (local)..."
+    /app/hub &
+    HUB_PID=$!
+
+    wait_for_hub
+
+    bashio::log.info "Alby Hub is running (PID ${HUB_PID})"
+    bashio::log.info "Web UI available at: http://homeassistant.local:8080 (or via HA Ingress)"
+    bashio::log.info "After first unlock: Apps → Add Connection → create NWC string for HA Integration"
+
+    # Keep the container alive; forward signals cleanly
+    wait "${HUB_PID}"
+
 else
     bashio::log.error "Unknown node_mode: '${NODE_MODE}'. Must be 'cloud' or 'expert'."
     exit 1
 fi
-
-# ──────────────────────────────────────────────
-# Optional NOSTR relay
-# ──────────────────────────────────────────────
-if bashio::var.true "${NOSTR_RELAY_ENABLED}"; then
-    bashio::log.info "Starting NOSTR relay on port 3334..."
-    NOSTR_DATA_DIR="${DATA_DIR}/nostr" /opt/nostr-relay/start.sh &
-fi
-
-# ──────────────────────────────────────────────
-# Wait-for-API helper used by HA integration probe
-# ──────────────────────────────────────────────
-wait_for_hub() {
-    local retries=30
-    local i=0
-    while [ $i -lt $retries ]; do
-        if curl -sf "http://localhost:8080/api/health" >/dev/null 2>&1; then
-            bashio::log.info "Alby Hub API is ready."
-            return 0
-        fi
-        i=$((i + 1))
-        sleep 2
-    done
-    bashio::log.error "Alby Hub did not start within 60 seconds."
-    return 1
-}
-
-# ──────────────────────────────────────────────
-# Start Alby Hub (the base image entrypoint)
-# ──────────────────────────────────────────────
-bashio::log.info "Launching Alby Hub..."
-/app/hub &
-HUB_PID=$!
-
-wait_for_hub
-
-bashio::log.info "Alby Hub is running (PID ${HUB_PID})"
-
-# Keep the container alive; forward signals cleanly
-wait "${HUB_PID}"
