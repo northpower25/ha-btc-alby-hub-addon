@@ -11,5 +11,5 @@ labels:
   org.opencontainers.image.description: >
     Self-custody Bitcoin Lightning node powered by getAlby Hub with
     Home Assistant integration, NOSTR relay, NFC payments and dashboards.
-  org.opencontainers.image.source: "https://github.com/northpower25/ha-btc-lightning-node-addon"
+  org.opencontainers.image.source: "https://github.com/northpower25/ha-btc-alby-hub-addon"
   org.opencontainers.image.licenses: "MIT"
