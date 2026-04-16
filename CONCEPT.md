@@ -278,7 +278,7 @@ Home Assistant (nur Integration, kein lokaler Hub-Container)
 > Nostr-Schlüssel für die verschlüsselte NWC-Kommunikation. Du siehst davon nichts
 > und musst nichts manuell einrichten.
 
-##### Sonderfall – Du hast bereits einen getAlby-Account
+##### Sonderfall – Du hast bereits einen Alby-Account (ehemals getAlby)
 
 Wenn du bereits einen bestehenden getAlby-/Alby-Hub-Account hast, musst du **keinen neuen Account** erstellen:
 
@@ -1051,7 +1051,7 @@ Beispiele für den direkten Nutzen im Home Assistant:
 - **Tür-/Schalter-Freigabe nach Zahlung:** Automation reagiert auf `alby_hub_payment_received` und öffnet z.B. ein Smart Lock.
 - **Spendenmodus im Dashboard:** Besucher scannen einen QR-Code, bezahlen sofort per Lightning.
 - **Pay-per-Use-Geräte:** Waschmaschine, 3D-Drucker oder Ladepunkt startet erst nach erfolgreicher Zahlung.
-- **Companion App als Wallet-Frontend:** Benutzer erstellt in HA Rechnungen, zeigt QR-Codes an und kann Zahlungen direkt aus der Home Assistant App initiieren.
+- **Companion App als Wallet-Frontend:** Benutzer erstellt in Home Assistant Rechnungen, zeigt QR-Codes an und kann Zahlungen direkt aus der Home Assistant App initiieren; für QR-Scan ist je nach Plattform (iOS/Android) ggf. eine eigene Shortcut/Intent-Integration nötig.
 
 > Damit kann die **Home Assistant Companion App** praktisch als Wallet-Oberfläche genutzt werden:
 > Rechnung erstellen/anzeigen (Empfangen) und Ziel-Rechnungen bzw. Lightning-Adressen eingeben (Bezahlen).
@@ -1092,7 +1092,7 @@ cards:
 Empfohlene Helper-Entities:
 
 - `input_number.lightning_amount`
-- `input_select.lightning_amount_unit` (`eur`, `usd`, `sat`, `btc`)
+- `input_select.lightning_amount_unit` (`EUR`, `USD`, `SAT`, `BTC`)
 - `input_select.lightning_currency` (`EUR`, `USD`)
 - `input_select.lightning_invoice_type` (`bolt12_offer`, `bolt11`)
 - `input_text.lightning_memo`
@@ -1135,6 +1135,19 @@ cards:
       - Lightning-Adresse/LNURL → `lightning.pay_lnurl` bzw. Address-Resolve + Zahlung
       - Betrag in EUR/USD wird vor dem Senden in sat/BTC umgerechnet.
 ```
+
+#### Hinweis zur Umsetzung der Beispiel-Skripte
+
+Die in den Karten referenzierten Skripte sind **Beispielnamen**, die in der HA-Integration
+als eigene Scripts/Automationen angelegt werden:
+
+- `script.alby_create_receive_request`: Liest Betrag + Einheit, rechnet bei Bedarf (EUR/USD → sat/BTC)
+  und erstellt abhängig von `input_select.lightning_invoice_type` entweder BOLT12 Offer oder BOLT11 Invoice.
+- `script.alby_scan_qr_to_target`: **Konzeptionelles Beispiel** für mobile QR-Erfassung; benötigt eine
+  eigene App-Umsetzung (z.B. App-Aktion/Deep-Link/Intent oder Shortcut), die den Scan-Text als Service-Daten
+  in `input_text.lightning_payment_target` schreibt.
+- `script.alby_pay_request`: Prüft das Ziel-Format (`lnbc...`/`lntb...` = BOLT11, `name@domain` = Lightning Address,
+  `lnurl...` = LNURL) und ruft den passenden Service auf (`lightning.send_payment` oder `lightning.pay_lnurl`).
 
 ---
 
