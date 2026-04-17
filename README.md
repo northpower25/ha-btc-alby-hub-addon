@@ -56,5 +56,6 @@ Dieses Repository stellt ein Home Assistant Add-on bereit, mit dem du **Bitcoin-
 ## Dokumentation
 
 - Konzept: [CONCEPT.md](CONCEPT.md)
+- Developer Handbuch (DE): [docs/developer-handbook.de.md](docs/developer-handbook.de.md)
 - Handbuch (DE): [docs/handbook.de.md](docs/handbook.de.md)
 - Handbook (EN): [docs/handbook.en.md](docs/handbook.en.md)
