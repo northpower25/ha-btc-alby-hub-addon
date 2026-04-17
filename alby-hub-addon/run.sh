@@ -14,6 +14,9 @@ bashio::log.info "Starting Alby Hub add-on..."
 bashio::log.info "  Mode      : ${NODE_MODE}"
 bashio::log.info "  NOSTR     : ${NOSTR_RELAY_ENABLED}"
 bashio::log.info "  External  : ${EXTERNAL_ACCESS_ENABLED}"
+bashio::log.warning "BETA WARNING: This add-on is beta software."
+bashio::log.warning "Losses are possible due to misconfiguration, user errors, or service/network failures."
+bashio::log.warning "Use only small test amounts. You are responsible for safe operation."
 
 # ──────────────────────────────────────────────
 # Persistent data directory (survives restarts)

@@ -1,5 +1,23 @@
 # Handbuch (DE) – Alby Hub Home Assistant Add-on & Integration
 
+## ⚠️ Beta-, Sicherheits- und Risikohinweis
+
+- Add-on und Integration sind aktuell **Beta-Software**.
+- Es können unter bestimmten Bedingungen **finanzielle Verluste** auftreten.
+- Verwende zum Testen **keine größeren Geldbeträge**; starte mit sehr kleinen Testbeträgen.
+- Typische Benutzerfehler:
+  - falscher oder unvollständiger NWC-Connection-String
+  - zu breite oder unpassende Scopes/Berechtigungen
+  - falsches Netzwerk (z. B. Mainnet statt Testnet)
+  - unsicher freigegebener externer Zugriff
+  - unzureichende Backup-/Secret-Verwaltung
+- Mögliche systemische Risiken:
+  - Ausfälle externer Services/Relays oder Upstream-Komponenten
+  - Netzwerkunterbrechungen/Instabilität
+  - inkonsistente Zustände bei Restart/Recovery
+  - unerwartete Kosten durch Routing-/Fee-Dynamik
+- Du bist selbst für die **verantwortungsvolle Nutzung** des Add-ons und der zugehörigen Integration verantwortlich.
+
 ## Zielversion und Kompatibilität
 
 - Minimale unterstützte Home-Assistant-Version (2026.x): **2026.1**

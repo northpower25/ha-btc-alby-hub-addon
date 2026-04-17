@@ -2,6 +2,15 @@
 
 Dieses Add-on stellt Alby Hub für Home Assistant bereit.
 
+## ⚠️ Wichtiger Beta- und Risikohinweis
+
+- Dieses Add-on und die zugehörige Integration sind **Beta-Software**.
+- Unter bestimmten Bedingungen können **Verluste** entstehen, z. B. durch Fehlkonfiguration, falsche Berechtigungen, Bedienfehler, Ausfälle externer Komponenten oder Software-/Netzwerkprobleme.
+- Nutze zum Testen **keine größeren Geldbeträge**; starte nur mit kleinen Testbeträgen.
+- Typische Benutzerfehler: falscher NWC-String, fehlende/zu breite Scopes, falsches Bitcoin-Netzwerk, unsicherer externer Zugriff, unzureichende Backups.
+- Systemische Risiken: Relay-/Dienst-Ausfälle, Netzwerkstörungen, Zustandsprobleme bei Neustarts, Änderungen in abhängigen Upstream-Komponenten.
+- Für eine sichere und verantwortungsvolle Nutzung von Add-on und Integration bist du selbst verantwortlich.
+
 ## Wofür dieses Add-on ist – und wofür die Integration
 
 - **Dieses Add-on** ist für den Betrieb bzw. die Bereitstellung von Alby Hub in Home Assistant gedacht (lokal im Expert-Modus oder als Cloud-Bridge im Cloud-Modus).
