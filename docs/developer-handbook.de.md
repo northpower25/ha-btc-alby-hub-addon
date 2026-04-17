@@ -30,7 +30,7 @@ Zusätzlich werden kritische Optionen über den Supervisor verwaltet (z. B. `nwc
 
 - Das Add-on hält **keine lokalen Wallet-Funds**.
 - Funds liegen im **externen Alby Hub Konto/Wallet**, das per NWC verbunden ist.
-- Hauptrisiko im Add-on: Verlust oder Fehlrotation von NWC-Secrets/Scopes.
+- Hauptrisiko im Add-on: Verlust oder fehlerhafte Rotation von NWC-Secrets/Scopes.
 
 ### 2) Expert-Modus mit lokalem LDK
 
