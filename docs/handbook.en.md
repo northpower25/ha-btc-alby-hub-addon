@@ -5,6 +5,12 @@
 - Minimum supported Home Assistant version (2026.x): **2026.1**
 - Applies to the add-on and planned HACS integration in the MVP.
 
+## Add-on vs Integration (quick overview)
+
+- **Add-on (`ha-btc-alby-hub-addon`)**: Provides the Alby Hub service (local add-on runtime or cloud bridge via NWC). This requires Home Assistant with Supervisor/add-on support.
+- **Integration (`ha-btc-alby-hub-integration`)**: Connects Alby Hub to Home Assistant (entities, services, automations, dashboard).
+- Recommendation: On HA OS/Supervised, usually use **add-on + integration** together; on HA Container, primarily use the **integration** with an external hub.
+
 <a id="support-matrix-en"></a>
 ## Support Matrix (MVP)
 

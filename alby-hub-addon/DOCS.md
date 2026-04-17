@@ -2,6 +2,12 @@
 
 Dieses Add-on stellt Alby Hub für Home Assistant bereit.
 
+## Wofür dieses Add-on ist – und wofür die Integration
+
+- **Dieses Add-on** ist für den Betrieb bzw. die Bereitstellung von Alby Hub in Home Assistant gedacht (lokal im Expert-Modus oder als Cloud-Bridge im Cloud-Modus).
+- **Die Integration** ([`ha-btc-alby-hub-integration`](https://github.com/northpower25/ha-btc-alby-hub-integration)) ist für die Home-Assistant-Anbindung gedacht: Entities, Services, Automationen und Dashboards über NWC.
+- Kurz gesagt: **Add-on = Hub bereitstellen**, **Integration = Hub in HA nutzbar machen**.
+
 ## Modi
 
 ### Cloud-Modus (`node_mode: cloud`)
