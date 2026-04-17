@@ -2,6 +2,15 @@
 
 Dieses Repository stellt ein Home Assistant Add-on bereit, mit dem du **Bitcoin-Lightning-Funktionen** über **Alby Hub** in dein Smart Home integrieren kannst.
 
+## ⚠️ Wichtiger Beta- und Risikohinweis
+
+- Dieses Add-on und die zugehörige Integration befinden sich in einer **Beta-Phase**.
+- Es können unter bestimmten Bedingungen **finanzielle Verluste** entstehen (z. B. durch Fehlkonfiguration, Bedienfehler, fehlerhafte Berechtigungen, Verbindungsprobleme oder Software-/Netzwerkfehler).
+- Bitte verwende zum Testen **keine größeren Geldbeträge** und arbeite zuerst mit sehr kleinen Testbeträgen.
+- Typische Benutzerfehler sind u. a. falsche NWC-Strings/Scopes, falsches Netzwerk (Mainnet/Testnet), unsichere Freigaben von externem Zugriff oder unzureichende Backup-/Secret-Verwaltung.
+- Mögliche systemische Risiken sind u. a. Ausfälle externer Dienste/Relays, Netzwerkpartitionen, Routing-/Mempool-Schwankungen, inkonsistente Zustände bei Restarts sowie Upstream-Änderungen.
+- Du bist selbst für die **verantwortungsvolle Verwendung** des Add-ons und der Integration verantwortlich, einschließlich Sicherheitskonfiguration, Teststrategie und eingesetzter Beträge.
+
 ## Was das Add-on bereitstellt
 
 - **Cloud-Modus**  
