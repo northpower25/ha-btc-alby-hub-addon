@@ -4,9 +4,9 @@ version: "1.0.0"
 slug: alby_hub
 description: >
   Self-custody Bitcoin Lightning Node powered by Alby Hub.
-  BETA WARNING: Dieses Add-on ist Beta-Software; unter bestimmten Bedingungen
-  können finanzielle Verluste entstehen. Keine großen Geldbeträge zum Testen
-  verwenden. Nutzung erfolgt in eigener Verantwortung.
+  BETA WARNING: This add-on is beta software; under certain conditions,
+  financial losses can occur. Do not use large amounts for testing.
+  Use at your own risk and responsibility.
   Cloud-Mode: verbindet sich mit externem Alby Hub via NWC Connection String
   (kein lokaler Node nötig, Account auf https://albyhub.com erstellen).
   Expert-Mode: betreibt Alby Hub vollständig lokal mit eigenem Lightning-Backend
