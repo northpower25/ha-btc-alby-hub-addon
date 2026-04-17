@@ -7,10 +7,10 @@ description: >
   BETA WARNING: This add-on is beta software; under certain conditions,
   financial losses can occur. Do not use large amounts for testing.
   Use at your own risk and responsibility.
-  Cloud-Mode: verbindet sich mit externem Alby Hub via NWC Connection String
-  (kein lokaler Node nötig, Account auf https://albyhub.com erstellen).
-  Expert-Mode: betreibt Alby Hub vollständig lokal mit eigenem Lightning-Backend
-  (LDK embedded, LND, CLN, Phoenixd). Inkl. optionalem NOSTR Relay.
+  Cloud mode: connects to an external Alby Hub via NWC connection string
+  (no local node required, create an account at https://albyhub.com).
+  Expert mode: runs Alby Hub fully local with its own Lightning backend
+  (LDK embedded, LND, CLN, Phoenixd), including optional NOSTR relay.
 url: "https://github.com/northpower25/ha-btc-alby-hub-addon"
 arch:
   - aarch64
