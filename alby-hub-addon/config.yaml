@@ -3,13 +3,13 @@ name: Alby Hub (Bitcoin Lightning)
 version: "1.0.0"
 slug: alby_hub
 description: >
-  Self-custody Bitcoin Lightning Node powered by Alby Hub.
-  BETA WARNING: This add-on is beta software; under certain conditions,
-  financial losses can occur. Do not use large amounts for testing.
-  Use at your own risk and responsibility.
-  Cloud mode: connects to an external Alby Hub via NWC connection string
-  (no local node required, create an account at https://albyhub.com).
-  Expert mode: runs Alby Hub fully local with its own Lightning backend
+  Self-custody Bitcoin Lightning Node powered by Alby Hub. BETA WARNING:
+  This add-on is beta software; under certain conditions, financial losses
+  can occur. Do not use large amounts for testing. Use at your own risk and
+  responsibility. Cloud-Mode: connects to an external Alby Hub via NWC
+  connection string (no local node required, create an account at
+  https://albyhub.com). Expert-Mode: runs Alby Hub fully locally with its own
+  Lightning backend
   (LDK embedded, LND, CLN, Phoenixd), including optional NOSTR relay.
 url: "https://github.com/northpower25/ha-btc-alby-hub-addon"
 arch:
