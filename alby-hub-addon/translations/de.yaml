@@ -2,56 +2,56 @@
 configuration:
   node_mode:
     name: Betriebsmodus
-    description: "Cloud = externer Hub via NWC. Expert = lokaler Hub im Add-on mit eigenem Backend. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-node-mode-de)"
+    description: "Cloud = externer Hub via NWC. Expert = lokaler Hub im Add-on mit eigenem Backend. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-node-mode-de"
   log_level:
     name: Log-Level
-    description: "Steuert die Detailtiefe der Logs (Standard: info). [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-log-level-de)"
+    description: "Steuert die Detailtiefe der Logs (Standard: info). Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-log-level-de"
   backup_passphrase:
     name: Backup-Passphrase
-    description: "Optional: verschlüsselt Backups. Sicher aufbewahren. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-backup-passphrase-de)"
+    description: "Optional: verschlüsselt Backups. Sicher aufbewahren. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-backup-passphrase-de"
   nwc_connection_string:
     name: NWC Connection String
-    description: "Pflicht im Cloud-Modus (nostr+walletconnect://…). Im Expert-Modus nicht nötig. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-nwc-connection-string-de)"
+    description: "Pflicht im Cloud-Modus (nostr+walletconnect://…). Im Expert-Modus nicht nötig. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-nwc-connection-string-de"
   bitcoin_network:
     name: Bitcoin-Netzwerk
-    description: "Nur im Expert-Modus relevant. Muss zum gewählten Backend passen. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-bitcoin-network-de)"
+    description: "Nur im Expert-Modus relevant. Muss zum gewählten Backend passen. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-bitcoin-network-de"
   node_backend:
     name: Node-Backend (Expert-Modus)
-    description: "Nur im Expert-Modus. LDK=eingebettet (Einstieg), LND/CLN=externe Full Nodes, Phoenixd=Phoenix-Backend, Cashu=experimentell. Backend-Zugangsdaten unter 'Nicht verwendete optionale Konfigurationsoptionen einblenden'. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-node-backend-de)"
+    description: "Nur im Expert-Modus. LDK=eingebettet (Einstieg), LND/CLN=externe Full Nodes, Phoenixd=Phoenix-Backend, Cashu=experimentell. Backend-Zugangsdaten unter 'Nicht verwendete optionale Konfigurationsoptionen einblenden'. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-node-backend-de"
   # ── Hinter "Nicht verwendete optionale Konfigurationsoptionen einblenden" ─
   tor_enabled:
     name: Tor-Proxy aktivieren
-    description: "Leitet ausgehende Verbindungen über einen SOCKS5-Proxy (z. B. Tor). [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-tor-enabled-de)"
+    description: "Leitet ausgehende Verbindungen über einen SOCKS5-Proxy (z. B. Tor). Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-tor-enabled-de"
   tor_socks5_url:
     name: Tor/SOCKS5 Proxy-URL
-    description: "Nur relevant wenn tor_enabled=true. Beispiel: socks5h://127.0.0.1:9050. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-tor-socks5-url-de)"
+    description: "Nur relevant wenn tor_enabled=true. Beispiel: socks5h://127.0.0.1:9050. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-tor-socks5-url-de"
   nostr_relay_enabled:
     name: Lokalen NOSTR-Relay-Proxy aktivieren
-    description: "Nur im Expert-Modus: startet NOSTR-Relay-Proxy auf Port 3334. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-nostr-relay-enabled-de)"
+    description: "Nur im Expert-Modus: startet NOSTR-Relay-Proxy auf Port 3334. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-nostr-relay-enabled-de"
   external_access_enabled:
     name: Externen Zugriff erlauben
-    description: "Bindet auf 0.0.0.0 statt nur localhost. Nur mit Firewall-Schutz aktivieren! [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-external-access-enabled-de)"
+    description: "Bindet auf 0.0.0.0 statt nur localhost. Nur mit Firewall-Schutz aktivieren! Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-external-access-enabled-de"
   hub_unlock_password:
     name: Hub-Unlock-Passwort (Expert-Modus)
-    description: "Expert-Modus: Auto-Unlock beim Neustart. Als Secret behandeln. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-hub-unlock-password-de)"
+    description: "Expert-Modus: Auto-Unlock beim Neustart. Als Secret behandeln. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-hub-unlock-password-de"
   lnd_rest_url:
     name: LND REST URL
-    description: "Nur bei node_backend=LND. REST-URL der LND-Instanz. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-rest-url-de)"
+    description: "Nur bei node_backend=LND. REST-URL der LND-Instanz. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-rest-url-de"
   lnd_macaroon_hex:
     name: LND Macaroon (HEX)
-    description: "Nur bei node_backend=LND. Macaroon als HEX-String für API-Zugriff. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-macaroon-hex-de)"
+    description: "Nur bei node_backend=LND. Macaroon als HEX-String für API-Zugriff. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-macaroon-hex-de"
   lnd_tls_cert:
     name: LND TLS-Zertifikat (HEX)
-    description: "Nur bei node_backend=LND, optional je nach TLS-Setup. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-tls-cert-de)"
+    description: "Nur bei node_backend=LND, optional je nach TLS-Setup. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-lnd-tls-cert-de"
   cln_rest_url:
     name: CLN REST URL
-    description: "Nur bei node_backend=CLN. REST-URL der CLN-Instanz. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-cln-rest-url-de)"
+    description: "Nur bei node_backend=CLN. REST-URL der CLN-Instanz. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-cln-rest-url-de"
   cln_rune:
     name: CLN Rune
-    description: "Nur bei node_backend=CLN. Authentifizierungs-Rune für CLN-API. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-cln-rune-de)"
+    description: "Nur bei node_backend=CLN. Authentifizierungs-Rune für CLN-API. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-cln-rune-de"
   phoenixd_url:
     name: Phoenixd URL
-    description: "Nur bei node_backend=Phoenixd. URL der phoenixd-Instanz. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-phoenixd-url-de)"
+    description: "Nur bei node_backend=Phoenixd. URL der phoenixd-Instanz. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-phoenixd-url-de"
   phoenixd_password:
     name: Phoenixd Passwort
-    description: "Nur bei node_backend=Phoenixd. API-Passwort für phoenixd. [Handbuch öffnen](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-phoenixd-password-de)"
+    description: "Nur bei node_backend=Phoenixd. API-Passwort für phoenixd. Handbuch: https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.de.md#addon-setting-phoenixd-password-de"
