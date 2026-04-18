@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.1
+## 0.0.6
 
 - Add-on-Dokumentation (`DOCS.md`) ergänzt
 - NOSTR-Relay-Startskript (`nostr-relay/start.sh`) ergänzt
