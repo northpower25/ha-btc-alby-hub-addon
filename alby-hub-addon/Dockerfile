@@ -14,12 +14,12 @@ RUN set -eux; \
     case "${TARGETARCH}" in \
         amd64) WEBSOCAT_ASSET="websocat.x86_64-unknown-linux-musl" ;; \
         arm64) WEBSOCAT_ASSET="websocat.aarch64-unknown-linux-musl" ;; \
-        *) echo "Unsupported architecture for websocat: ${TARGETARCH}"; exit 1 ;; \
+        *) WEBSOCAT_ASSET=""; echo "Warning: unsupported architecture for websocat: ${TARGETARCH}"; ;; \
     esac; \
-    if curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
+    if [ -n "${WEBSOCAT_ASSET}" ] && curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
         chmod +x /usr/local/bin/websocat; \
     else \
-        echo "Warning: failed to download websocat binary; NOSTR relay checks/proxy require websocat."; \
+        echo "Warning: failed to download websocat binary; Nostr relay checks/proxy require websocat."; \
     fi; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
