@@ -1,6 +1,7 @@
 ARG BUILD_FROM=ghcr.io/getalby/hub:latest
 FROM ${BUILD_FROM}
 ARG TARGETARCH
+ARG WEBSOCAT_VERSION=v1.14.1
 
 # Install additional utilities for the HA add-on wrapper
 RUN set -eux; \
@@ -19,7 +20,7 @@ RUN set -eux; \
     esac; \
     if [ -z "${WEBSOCAT_ASSET}" ]; then \
         echo "Warning: websocat installation skipped for unsupported architecture: ${TARGETARCH}" >&2; \
-    elif curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
+    elif curl -fsSL "https://github.com/vi/websocat/releases/download/${WEBSOCAT_VERSION}/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
         if echo "${WEBSOCAT_SHA256}  /usr/local/bin/websocat" | sha256sum -c -; then \
             chmod +x /usr/local/bin/websocat; \
         else \
