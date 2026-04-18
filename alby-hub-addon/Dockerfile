@@ -1,15 +1,25 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/getalby/hub:latest
 FROM ${BUILD_FROM}
+ARG TARGETARCH
 
 # Install additional utilities for the HA add-on wrapper
-RUN apk add --no-cache \
-    bash \
-    curl \
-    jq \
-    openssl \
-    ca-certificates \
-    websocat \
-    && rm -rf /var/cache/apk/*
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        bash \
+        curl \
+        jq \
+        openssl \
+        ca-certificates; \
+    case "${TARGETARCH}" in \
+        amd64) WEBSOCAT_ASSET="websocat.x86_64-unknown-linux-musl" ;; \
+        arm64) WEBSOCAT_ASSET="websocat.aarch64-unknown-linux-musl" ;; \
+        *) echo "Unsupported architecture for websocat: ${TARGETARCH}"; exit 1 ;; \
+    esac; \
+    curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; \
+    chmod +x /usr/local/bin/websocat; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
 # Install nostr-relay (strfry or lightweight Go relay)
 # We ship a minimal Go-based relay binary compiled for both amd64/aarch64
