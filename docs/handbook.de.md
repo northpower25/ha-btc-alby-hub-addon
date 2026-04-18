@@ -90,6 +90,35 @@ Wenn Funds nach Recovery nicht sichtbar sind:
   - Add-on-Repository: `https://github.com/northpower25/ha-btc-alby-hub-addon`
   - Integration: `https://github.com/northpower25/ha-btc-alby-hub-integration`
 
+### Alby Account + NWC im Cloud-Modus (Schritt-für-Schritt)
+
+Für die Cloud-Anbindung in diesem Add-on benötigst du einen Alby Account:
+
+- Account: `https://getalby.com`
+- Alby Hub: `https://albyhub.com`
+- Aktuelle Modelle/Pläne: `https://getalby.com/pricing`
+
+#### Welches Alby-Modell ist für welchen Einsatzzweck sinnvoll?
+
+| Modell | Geeignet für | Empfehlung |
+|---|---|---|
+| **Alby Hub Cloud** (gehostet) | Du willst schnell starten, ohne eigenen Server/Node-Betrieb | Standard für Einsteiger und Cloud-Modus im Add-on |
+| **Self-Hosted Alby Hub** | Du willst Self-Custody mit eigener Infrastruktur und maximaler Kontrolle | Für fortgeschrittene Nutzer |
+| **Eigenes externes Backend/Wallet (BYOW/BYON)** | Du betreibst bereits LND/CLN/Phoenixd/Cashu und willst Alby als Verbindungs-/App-Schicht | Für bestehende Node-Setups |
+
+#### NWC-Verbindung erstellen und im Add-on nutzen
+
+1. Bei `https://getalby.com` anmelden oder Account erstellen.
+2. In `https://albyhub.com` die gewünschte Variante verwenden (für den einfachen Einstieg: **Alby Hub Cloud**).
+3. In Alby Hub zu `Apps` → `Add Connection` gehen.
+4. Verbindungsrechte so eng wie möglich setzen (nur benötigte Scopes).
+5. Den erzeugten NWC-String kopieren (`nostr+walletconnect://...` mit `relay` und `secret`).
+6. Im Add-on konfigurieren:
+   - `node_mode: cloud`
+   - `nwc_connection_string: "<NWC-String>"`
+7. Add-on speichern, neu starten und Logs prüfen.
+8. Danach Integration einrichten und denselben NWC-String eintragen.
+
 ### Option A: Installation mit HACS (empfohlen für die Integration)
 
 #### A1) Add-on installieren (zuerst)

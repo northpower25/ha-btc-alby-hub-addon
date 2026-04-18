@@ -48,6 +48,31 @@ Dieses Add-on stellt Alby Hub für Home Assistant bereit.
    Expert-Modus: Hub über Ingress öffnen, initial entsperren, NWC-Verbindung in `Apps` erzeugen
 3. Danach Home-Assistant-Integration mit dem NWC-String verbinden
 
+## Cloud-Modus: Mit Alby Account per NWC verbinden (Schritt für Schritt)
+
+Für diese Cloud-Variante ist ein Alby Account erforderlich: `https://getalby.com`  
+Alby Hub: `https://albyhub.com`  
+Modelle/Pläne: `https://getalby.com/pricing`
+
+### Welche Account-/Betriebsvariante für welchen Zweck?
+
+| Modell | Geeignet für |
+|---|---|
+| **Alby Hub Cloud** (gehostet) | Einsteiger, schneller Start, kein eigener Node-Betrieb |
+| **Self-Hosted Alby Hub** | Fortgeschrittene Self-Custody-Setups mit eigener Infrastruktur |
+| **Eigenes externes Backend/Wallet (BYOW/BYON)** | Bestehende LND/CLN/Phoenixd/Cashu-Umgebungen |
+
+### Schritte
+
+1. Alby Account unter `https://getalby.com` erstellen oder anmelden.
+2. In Alby Hub (`https://albyhub.com`) die passende Variante nutzen (für einfachen Cloud-Start: **Alby Hub Cloud**).
+3. In Alby Hub eine NWC-Verbindung erzeugen: `Apps` → `Add Connection`.
+4. Berechtigungen knapp halten (nur benötigte Scopes) und Verbindung speichern.
+5. NWC-String kopieren (`nostr+walletconnect://...` inkl. `relay` und `secret`).
+6. Im Add-on setzen: `node_mode: cloud` und `nwc_connection_string`.
+7. Add-on speichern/neustarten und Logs prüfen.
+8. Danach die Home-Assistant-Integration mit demselben NWC-String verbinden.
+
 ## Update- und Backup-Pflicht vor jedem Update
 
 - Erstelle vor jedem Update ein vollständiges Home-Assistant-Backup.

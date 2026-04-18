@@ -93,6 +93,36 @@ Dieses Repository stellt ein Home Assistant Add-on bereit, mit dem du **Bitcoin-
    Repository: [`ha-btc-alby-hub-integration`](https://github.com/northpower25/ha-btc-alby-hub-integration)
 2. **Integration mit dem NWC-String verbinden**
 
+## Schritt-für-Schritt: Add-on mit Alby Account per NWC verbinden (Cloud-Modus)
+
+> Für diese Variante brauchst du einen **Alby Account**:  
+> `https://getalby.com`  
+> Alby Hub: `https://albyhub.com`  
+> Aktuelle Modelle/Pläne: `https://getalby.com/pricing`
+
+### Welches Alby-Modell passt zu welchem Einsatzzweck?
+
+| Modell | Geeignet für | Empfehlung |
+|---|---|---|
+| **Alby Hub Cloud** (gehostet) | Schnellstart ohne eigenen Server/Node, möglichst wenig Betriebsaufwand | Beste Wahl für Einsteiger und schnelle Inbetriebnahme |
+| **Self-Hosted Alby Hub** (eigener Betrieb) | Volle Self-Custody, eigener Stack, mehr Kontrolle | Für fortgeschrittene Nutzer mit eigener Infrastruktur |
+| **Externes eigenes Backend/Wallet (BYOW/BYON)** | Du betreibst bereits LND/CLN/Phoenixd/Cashu und willst Alby nur als Verbindungs-/App-Schicht nutzen | Für bestehende Node-Setups und Integrationsszenarien |
+
+### Verbindung in Home Assistant einrichten
+
+1. **Alby Account erstellen/anmelden** auf `https://getalby.com`.
+2. **Passendes Modell wählen** (oben):  
+   Für den einfachen Cloud-Einstieg in diesem Add-on: **Alby Hub Cloud**.
+3. **NWC-Verbindung in Alby Hub erstellen**:  
+   `Apps` → `Add Connection` (Berechtigungen/Scopes möglichst minimal setzen).
+4. **NWC-Connection-String kopieren** (`nostr+walletconnect://...` mit `relay` und `secret`).
+5. **Im Add-on konfigurieren**:
+   - `node_mode: cloud`
+   - `nwc_connection_string: "<dein kopierter NWC-String>"`
+6. **Add-on speichern und neu starten**, danach Logs prüfen.
+7. **Integration installieren/öffnen** und denselben NWC-String einfügen.
+8. **Verbindung testen** (Status/Entitäten sichtbar = erfolgreich).
+
 Vollständige Schritt-für-Schritt-Anleitungen:
 - DE: [Handbuch](docs/handbook.de.md#installation-und-konfiguration-in-home-assistant-hacs--manuell)
 - EN: [Handbook](docs/handbook.en.md#installation-and-configuration-in-home-assistant-hacs--manual)
