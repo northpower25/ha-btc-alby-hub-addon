@@ -34,50 +34,50 @@ ingress_stream: false
 panel_icon: mdi:lightning-bolt
 panel_title: Alby Hub
 options:
-  # ── Modus-Auswahl ──────────────────────────────────────────────────────────
-  # "cloud"  → Kein lokaler Node. NWC-String von albyhub.com oder externem Hub.
-  #            Account erstellen: https://albyhub.com
-  #            Hub-Dashboard → Apps → Add Connection → NWC-String kopieren
-  # "expert" → Lokaler Alby Hub mit eigenem Lightning-Backend (LDK/LND/CLN/…)
+  # ── Einsteiger-Variante (Cloud) ────────────────────────────────────────────
+  # Standard-Einstieg: externen Alby Hub per NWC anbinden.
+  # NWC-String erzeugen: https://albyhub.com → Apps → Add Connection
   node_mode: "cloud"
-
-  # ── Allgemein ──────────────────────────────────────────────────────────────
-  log_level: info
-  backup_passphrase: ""
-
-  # ── Cloud-Modus: NWC Connection String ────────────────────────────────────
-  # Woher bekomme ich meinen NWC-String?
-  #   1. https://albyhub.com → Account erstellen / einloggen
-  #   2. Hub-Dashboard → linkes Menü „Apps" → „Add Connection"
-  #   3. App-Name z.B. „Home Assistant" eingeben
-  #   4. Berechtigungen wählen (get_info, get_balance, list_transactions,
-  #      make_invoice, pay_invoice)
-  #   5. NWC-String kopieren: nostr+walletconnect://...
   nwc_connection_string: ""
 
-  # ── Expert-Modus: Lightning-Backend & Netzwerk ────────────────────────────
-  bitcoin_network: mainnet
-  # LDK: eingebettet, kein externer Node nötig (Standard/Empfehlung für Einstieg)
-  # LND: externe LND-Node (lnd_rest_url + lnd_macaroon_hex erforderlich)
-  # CLN: externe Core-Lightning-Node (cln_rest_url + cln_rune erforderlich)
-  # Phoenixd: externes phoenixd-Backend (phoenixd_url + phoenixd_password erforderlich)
-  # Cashu: experimentelles Ecash-Backend (nur für fortgeschrittene Tests)
-  node_backend: "LDK"
-
-  # ── Optionale / fortgeschrittene Einstellungen ───────────────────────────
-  # Die folgenden Felder werden im UI hinter "Nicht verwendete optionale
-  # Konfigurationsoptionen einblenden" verborgen, da sie nur für bestimmte
-  # Setups oder Backends benötigt werden.
+  # ── Experten-Toggle (UI) ───────────────────────────────────────────────────
+  # Für die Experten-Variante im UI "Nicht verwendete optionale
+  # Konfigurationsoptionen einblenden" aktivieren.
+  # Danach:
+  #   1) node_mode auf "expert" setzen
+  #   2) Experten-Settings unten aktivieren (Zeilen entkommentieren)
+  #   3) node_backend als Node-Varianten-Toggle wählen (LDK/LND/CLN/Phoenixd/Cashu)
   #
-  # tor_enabled: false               ← aktiviert Tor-Proxy-Routing
-  # tor_socks5_url: socks5h://...    ← Proxy-URL (nur wenn tor_enabled=true)
-  # nostr_relay_enabled: false       ← lokaler NOSTR-Relay (Expert-Modus)
-  # external_access_enabled: false   ← Bind auf 0.0.0.0 (Vorsicht!)
-  # hub_unlock_password: ""          ← Auto-Unlock (Expert-Modus)
+  # ── Experten-Settings (allgemein) ──────────────────────────────────────────
+  # log_level: info                         # Log-Level: trace|debug|info|notice|warning|error|fatal
+  # backup_passphrase: ""                   # Optional: verschlüsselt Backups
+  # bitcoin_network: mainnet                # Netzwerk: mainnet|testnet|signet|mutinynet
+  # node_backend: "LDK"                     # Node-Variante: LDK|LND|CLN|Phoenixd|Cashu
+  # tor_enabled: false                      # Leitet ausgehenden Traffic via SOCKS5/Tor
+  # tor_socks5_url: socks5h://127.0.0.1:9050 # SOCKS5-Proxy-URL (nur wenn tor_enabled=true)
+  # nostr_relay_enabled: false              # Startet lokalen NOSTR-Relay-Proxy (Port 3334)
+  # external_access_enabled: false          # Bindet Hub auf 0.0.0.0 (nur mit Firewall)
+  # hub_unlock_password: ""                 # Optionales Auto-Unlock-Passwort (Secret)
   #
-  # LND: lnd_rest_url, lnd_macaroon_hex, lnd_tls_cert
-  # CLN: cln_rest_url, cln_rune
-  # Phoenixd: phoenixd_url, phoenixd_password
+  # ── Node-Varianten (Toggle via node_backend) ──────────────────────────────
+  # LDK (node_backend: LDK)
+  #   Keine zusätzlichen Pflichtfelder.
+  #
+  # LND (node_backend: LND)
+  # lnd_rest_url: https://lnd-host:8080     # Pflicht: LND REST URL
+  # lnd_macaroon_hex: ""                    # Pflicht: LND Macaroon als HEX
+  # lnd_tls_cert: ""                        # Optional: LND TLS-Zertifikat als HEX
+  #
+  # CLN (node_backend: CLN)
+  # cln_rest_url: https://cln-host:3010     # Pflicht: CLN REST URL
+  # cln_rune: ""                            # Pflicht: CLN Rune
+  #
+  # Phoenixd (node_backend: Phoenixd)
+  # phoenixd_url: http://phoenixd-host:9740 # Pflicht: Phoenixd URL
+  # phoenixd_password: ""                   # Pflicht: Phoenixd API-Passwort
+  #
+  # Cashu (node_backend: Cashu)
+  #   Derzeit keine zusätzlichen Add-on-Felder.
 
 schema:
   node_mode: list(cloud|expert)
@@ -86,7 +86,7 @@ schema:
   nwc_connection_string: str?
   bitcoin_network: list(mainnet|testnet|signet|mutinynet)?
   node_backend: list(LDK|LND|CLN|Phoenixd|Cashu)?
-  # ── Hinter Toggle versteckt (optional, kein Default in options:) ─────────
+  # ── Experten-/Node-Optionen hinter UI-Toggle (kein Default in options:) ───
   tor_enabled: bool?
   tor_socks5_url: str?
   nostr_relay_enabled: bool?
