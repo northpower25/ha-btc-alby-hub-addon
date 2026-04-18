@@ -1,6 +1,6 @@
 ---
 name: Alby Hub (Bitcoin Lightning)
-version: "0.0.3"
+version: "0.0.4"
 slug: alby_hub
 description: >
   Self-custody Bitcoin Lightning Node powered by Alby Hub. BETA WARNING:
