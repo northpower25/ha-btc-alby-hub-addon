@@ -17,7 +17,7 @@ configuration:
     description: "Expert mode only. Must match your chosen backend. [Open handbook](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.en.md#addon-setting-bitcoin-network-en)"
   node_backend:
     name: Node backend (expert mode)
-    description: "Expert mode only. LDK=embedded (easy start), LND/CLN=external full nodes, Phoenixd=Phoenix backend, Cashu=experimental. Backend credentials are under 'Show unused optional options'. [Open handbook](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.en.md#addon-setting-node-backend-en)"
+    description: "Expert mode only. LDK=embedded (easy start), LND/CLN=external full nodes, Phoenixd=Phoenix backend, Cashu=experimental. Backend credentials are under 'Show unused optional configuration options'. [Open handbook](https://github.com/northpower25/ha-btc-alby-hub-addon/blob/HEAD/docs/handbook.en.md#addon-setting-node-backend-en)"
   # ── Shown only when "Show unused optional configuration options" is toggled ─
   tor_enabled:
     name: Enable Tor proxy
