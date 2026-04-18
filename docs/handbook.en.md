@@ -80,6 +80,60 @@ If funds are not visible after recovery:
 - **Integration (`ha-btc-alby-hub-integration`)**: Connects Alby Hub to Home Assistant (entities, services, automations, dashboard).
 - Recommendation: On HA OS/Supervised, usually use **add-on + integration** together; on HA Container, primarily use the **integration** with an external hub.
 
+## Installation and Configuration in Home Assistant (HACS + manual)
+
+### Prerequisites
+
+- Home Assistant **2026.1+**
+- For add-on usage: Home Assistant with **Supervisor/add-on support** (HA OS or Supervised)
+- Network access to:
+  - Add-on repository: `https://github.com/northpower25/ha-btc-alby-hub-addon`
+  - Integration repository: `https://github.com/northpower25/ha-btc-alby-hub-integration`
+
+### Option A: Install with HACS (recommended for the integration)
+
+1. **Install HACS** (if not already installed) and restart Home Assistant.
+2. **Add the integration repository**  
+   In HACS, add a custom repository:  
+   `https://github.com/northpower25/ha-btc-alby-hub-integration` (Category: Integration)
+3. **Install the integration** and restart Home Assistant.
+4. **Add the add-on repository**  
+   Home Assistant → Settings → Add-ons → Add-on Store → menu (⋮) → Repositories  
+   Add URL: `https://github.com/northpower25/ha-btc-alby-hub-addon`
+5. **Install the add-on**  
+   Open “Alby Hub (Bitcoin Lightning)”, install, and start it.
+6. **Set up the integration**  
+   Settings → Devices & Services → Add Integration → select Alby Hub integration.
+
+### Option B: Manual installation (without HACS)
+
+1. **Install the integration manually**
+   - Download the `ha-btc-alby-hub-integration` repository ZIP.
+   - Extract and copy the custom component folder to  
+     `/config/custom_components/`.
+   - Restart Home Assistant.
+2. **Install the add-on manually**
+   - Either add the add-on repository in Add-on Store (same as Option A, step 4), or
+   - for local development, copy the add-on folder to  
+     `/addons/local/alby-hub-addon/` and reload Supervisor.
+3. **Install/start the add-on** and then add the integration in “Devices & Services”.
+
+### Configure the add-on (step by step)
+
+1. Open the add-on and save configuration.
+2. Choose mode:
+   - **Cloud mode**: set `node_mode: cloud` and `nwc_connection_string`.
+   - **Expert mode**: set `node_mode: expert`, backend (`node_backend`), and backend parameters.
+3. Start the add-on and check logs.
+4. In expert mode: open ingress, perform initial hub setup/unlock, and create an NWC app connection in “Apps”.
+5. In the integration, paste the NWC string and run a connectivity test.
+
+### Post-setup verification
+
+1. Verify entities/status in the integration.
+2. Optionally run a very small test payment.
+3. Before production use, verify backup/restore readiness.
+
 <a id="support-matrix-en"></a>
 ## Support Matrix (MVP)
 

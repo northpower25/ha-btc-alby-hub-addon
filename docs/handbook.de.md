@@ -80,6 +80,60 @@ Wenn Funds nach Recovery nicht sichtbar sind:
 - **Integration (`ha-btc-alby-hub-integration`)**: Bindet Alby Hub in Home Assistant ein (Entities, Services, Automationen, Dashboard).
 - Empfehlung: Bei HA OS/Supervised meist **Add-on + Integration** gemeinsam nutzen; bei HA Container primär die **Integration** mit externem Hub.
 
+## Installation und Konfiguration in Home Assistant (HACS + manuell)
+
+### Voraussetzungen
+
+- Home Assistant **2026.1+**
+- Für Add-on-Nutzung: Home Assistant mit **Supervisor/Add-on-Support** (HA OS oder Supervised)
+- Netzwerkzugriff auf:
+  - Add-on-Repository: `https://github.com/northpower25/ha-btc-alby-hub-addon`
+  - Integration: `https://github.com/northpower25/ha-btc-alby-hub-integration`
+
+### Option A: Installation mit HACS (empfohlen für die Integration)
+
+1. **HACS installieren** (falls noch nicht vorhanden) und Home Assistant neu starten.
+2. **Integration hinzufügen**  
+   In HACS unter „Custom repositories“ hinzufügen:  
+   `https://github.com/northpower25/ha-btc-alby-hub-integration` (Kategorie: Integration)
+3. **Integration installieren** und Home Assistant neu starten.
+4. **Add-on-Repository hinzufügen**  
+   Home Assistant → Einstellungen → Add-ons → Add-on-Store → Menü (⋮) → Repositories  
+   URL eintragen: `https://github.com/northpower25/ha-btc-alby-hub-addon`
+5. **Add-on installieren**  
+   Add-on „Alby Hub (Bitcoin Lightning)“ öffnen, installieren, starten.
+6. **Integration einrichten**  
+   Einstellungen → Geräte & Dienste → Integration hinzufügen → Alby Hub Integration auswählen.
+
+### Option B: Manuelle Installation (ohne HACS)
+
+1. **Integration manuell installieren**
+   - Repository `ha-btc-alby-hub-integration` als ZIP herunterladen.
+   - Entpacken und den Ordner der Custom Component nach  
+     `/config/custom_components/` kopieren.
+   - Home Assistant neu starten.
+2. **Add-on manuell installieren**
+   - Entweder als Repository im Add-on-Store eintragen (wie in Option A, Schritt 4), oder
+   - für lokale Entwicklung den Add-on-Ordner nach  
+     `/addons/local/alby-hub-addon/` kopieren und den Supervisor neu laden.
+3. **Add-on installieren/starten** und anschließend die Integration in „Geräte & Dienste“ hinzufügen.
+
+### Add-on konfigurieren (Schritt für Schritt)
+
+1. Add-on öffnen und Konfiguration speichern.
+2. Betriebsmodus wählen:
+   - **Cloud-Modus**: `node_mode: cloud` und `nwc_connection_string` setzen.
+   - **Expert-Modus**: `node_mode: expert`, Backend (`node_backend`) und Backend-Parameter setzen.
+3. Add-on starten und Logs prüfen.
+4. Bei Expert-Modus: Ingress öffnen, Hub initial einrichten/unlocken und NWC-Verbindung in „Apps“ erzeugen.
+5. In der Integration den NWC-String eintragen und Verbindungstest ausführen.
+
+### Funktionstest nach der Einrichtung
+
+1. In der Integration Entitäten/Status prüfen.
+2. Optional einen kleinen Test (z. B. Mini-Zahlung) durchführen.
+3. Vor produktiver Nutzung Backup-/Restore-Fähigkeit verifizieren.
+
 <a id="support-matrix-de"></a>
 ## Support-Matrix (MVP)
 
