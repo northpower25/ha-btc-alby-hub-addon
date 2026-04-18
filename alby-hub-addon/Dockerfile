@@ -17,11 +17,17 @@ RUN set -eux; \
         # Supported add-on architectures map to Docker TARGETARCH values: amd64, arm64
         *) WEBSOCAT_ASSET=""; echo "Warning: unsupported architecture for websocat: ${TARGETARCH}" >&2; ;; \
     esac; \
-    if [ -n "${WEBSOCAT_ASSET}" ] && curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
-        echo "${WEBSOCAT_SHA256}  /usr/local/bin/websocat" | sha256sum -c -; \
-        chmod +x /usr/local/bin/websocat; \
+    if [ -z "${WEBSOCAT_ASSET}" ]; then \
+        echo "Warning: websocat installation skipped for unsupported architecture: ${TARGETARCH}" >&2; \
+    elif curl -fsSL "https://github.com/vi/websocat/releases/download/v1.14.1/${WEBSOCAT_ASSET}" -o /usr/local/bin/websocat; then \
+        if echo "${WEBSOCAT_SHA256}  /usr/local/bin/websocat" | sha256sum -c -; then \
+            chmod +x /usr/local/bin/websocat; \
+        else \
+            echo "Error: websocat SHA256 verification failed for ${WEBSOCAT_ASSET}" >&2; \
+            exit 1; \
+        fi; \
     else \
-        echo "Warning: failed to download websocat binary; Nostr relay checks/proxy require websocat." >&2; \
+        echo "Warning: failed to download websocat binary asset ${WEBSOCAT_ASSET}; Nostr relay checks/proxy require websocat." >&2; \
     fi; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
