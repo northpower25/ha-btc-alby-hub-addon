@@ -80,11 +80,28 @@ If funds are not visible after recovery:
 - **Integration (`ha-btc-alby-hub-integration`)**: Connects Alby Hub to Home Assistant (entities, services, automations, dashboard).
 - Recommendation: On HA OS/Supervised, usually use **add-on + integration** together; on HA Container, primarily use the **integration** with an external hub.
 
-## Alignment with the official Alby handbook
+## Alignment with the official Alby handbook and flavor overview
 
 - Alby Hub handbook: https://guides.getalby.com/user-guide/alby-hub
 - Getting started: https://guides.getalby.com/user-guide/alby-hub/getting-started
 - Alby Hub flavors: https://guides.getalby.com/user-guide/alby-hub/alby-hub-flavors
+
+The official **Alby Hub flavors** describe **where** Alby Hub can be deployed:
+Alby Cloud · Desktop · Docker · Umbrel/Start9/etc. · Linux
+
+**Where this add-on fits:**
+
+| Add-on mode | Classification | What happens |
+|---|---|---|
+| `node_mode: expert` | **Umbrel / Start9 / etc. – but for Home Assistant** | Alby Hub runs fully inside the add-on on your HA system. Home Assistant is the hosting platform. |
+| `node_mode: cloud` | **No local Hub in the add-on** | The add-on connects HA via NWC to a Hub running elsewhere (e.g. Alby Cloud, Docker, Linux, etc.). |
+
+**Expert mode: backend selection**
+
+| `node_backend` | Meaning |
+|---|---|
+| `LDK` | Embedded lightning node inside Hub (recommended for beginners) |
+| `LND` / `CLN` / `Phoenixd` / `Cashu` | Hub connects to your own existing node (BYON – Bring Your Own Node) |
 
 ## Installation and Configuration in Home Assistant (HACS + manual)
 
@@ -104,21 +121,34 @@ For cloud connectivity in this add-on, you need an Alby account:
 - Alby Hub: `https://albyhub.com`
 - Current models/plans: `https://getalby.com/pricing`
 
-#### Which Alby model fits which use case?
+#### Which Hub starting point is right for you?
 
-| Model | Best for | Recommendation |
+| Option | Best for | Recommendation |
 |---|---|---|
-| **Alby Hub Cloud** (hosted) | You want a fast start without running your own server/node | Default choice for beginners and this add-on’s cloud mode |
-| **Self-hosted Alby Hub** | You want self-custody with your own infrastructure and maximum control | Best for advanced users |
-| **Own external backend/wallet (BYOW/BYON)** | You already run LND/CLN/Phoenixd/Cashu and use Alby mainly as an app/connection layer | Best for existing node setups |
+| **Alby Cloud** (hosted by Alby) | Fast start without own server infrastructure | Best choice for beginners who do not want to self-host a Hub |
+| **Expert mode of this add-on** (Hub directly in HA) | Running a Hub on your own HA system | For HA users who want a local Hub on their HA device |
+| **Other self-hosted Hub** (Docker, Linux, Umbrel, ...) | Full control, own infrastructure outside HA | For advanced users with their own server setup |
 
 #### Where this add-on fits in official Alby Hub flavors
 
-| Add-on setting | Official flavor | Meaning |
+The official **Alby Hub flavors** describe **where** Alby Hub is deployed:
+- Alby Cloud
+- Desktop
+- Docker
+- Umbrel/Start9/etc.
+- Linux
+
+| Add-on mode | Classification | What happens |
 |---|---|---|
-| `node_mode: cloud` | **Alby Hub Cloud** | The add-on acts as an NWC bridge to an externally hosted Alby Hub. |
-| `node_mode: expert` + `node_backend: LDK` | **Self-Hosted Alby Hub** | Alby Hub runs locally in the add-on with an embedded backend. |
-| `node_mode: expert` + `node_backend: LND/CLN/Phoenixd/Cashu` | **Bring Your Own Node/Wallet (BYON/BYOW)** | Alby Hub runs in the add-on while using your existing external backend. |
+| `node_mode: expert` | **Umbrel / Start9 / etc. – for Home Assistant** | Alby Hub runs fully inside the add-on on your HA system. Home Assistant is the hosting platform. |
+| `node_mode: cloud` | **No local Hub in the add-on** | The add-on connects HA via NWC to a Hub running elsewhere (e.g. Alby Cloud, Docker, Linux, etc.). |
+
+**Expert mode: backend selection (BYON – Bring Your Own Node)**
+
+| `node_backend` | Meaning |
+|---|---|
+| `LDK` | Embedded lightning node inside Hub (recommended for beginners) |
+| `LND` / `CLN` / `Phoenixd` / `Cashu` | Hub connects to your own existing node |
 
 #### Create NWC and use it in the add-on
 

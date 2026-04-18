@@ -31,17 +31,30 @@ Dieses Add-on stellt Alby Hub für Home Assistant bereit.
 - Unterstützte Backends: `LDK`, `LND`, `CLN`, `Phoenixd`, `Cashu`
 - Optionales NOSTR-Relay-Proxy auf Port `3334` (`nostr_relay_enabled: true`)
 
-## Offizielles Alby-Handbuch & Flavors-Zuordnung
+## Offizielles Alby-Handbuch & Einordnung in die Alby-Hub-Flavors
 
 - Alby Hub Handbuch: https://guides.getalby.com/user-guide/alby-hub
 - Getting Started: https://guides.getalby.com/user-guide/alby-hub/getting-started
 - Alby Hub Flavors: https://guides.getalby.com/user-guide/alby-hub/alby-hub-flavors
 
-| Add-on-Einstellung | Offizieller Flavor | Bedeutung |
+Die offiziellen Alby-Hub-Flavors beschreiben, **wo** du Alby Hub betreiben kannst:
+- Alby Cloud
+- Desktop
+- Docker
+- Umbrel/Start9/etc.
+- Linux
+
+| Add-on-Modus | Einordnung | Was passiert |
 |---|---|---|
-| `node_mode: cloud` | **Alby Hub Cloud** | Externer gehosteter Hub, angebunden per NWC. Kein lokaler Node im Add-on. |
-| `node_mode: expert` + `node_backend: LDK` | **Self-Hosted Alby Hub** | Hub und Backend laufen lokal im Add-on. |
-| `node_mode: expert` + `node_backend: LND/CLN/Phoenixd/Cashu` | **Bring Your Own Node/Wallet (BYON/BYOW)** | Hub läuft im Add-on, Node/Wallet-Backend ist extern und wird angebunden. |
+| `node_mode: expert` | **Umbrel / Start9 / etc. – für Home Assistant** | Alby Hub läuft vollständig im Add-on auf deinem HA-System. |
+| `node_mode: cloud` | **Kein eigener Hub im Add-on** | Das Add-on verbindet HA per NWC mit einem Hub, der woanders läuft (Alby Cloud, Docker, Linux, etc.). |
+
+**Expert-Modus: Backend-Auswahl**
+
+| `node_backend` | Bedeutung |
+|---|---|
+| `LDK` | Eingebetteter Lightning-Node im Hub (empfohlen für Einsteiger) |
+| `LND` / `CLN` / `Phoenixd` / `Cashu` | Verbindung mit einem bestehenden eigenen Node (BYON) |
 
 ## Konfigurationshinweise
 

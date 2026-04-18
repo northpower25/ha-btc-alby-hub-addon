@@ -80,11 +80,32 @@ Wenn Funds nach Recovery nicht sichtbar sind:
 - **Integration (`ha-btc-alby-hub-integration`)**: Bindet Alby Hub in Home Assistant ein (Entities, Services, Automationen, Dashboard).
 - Empfehlung: Bei HA OS/Supervised meist **Add-on + Integration** gemeinsam nutzen; bei HA Container primär die **Integration** mit externem Hub.
 
-## Abgleich mit dem offiziellen Alby-Handbuch
+## Abgleich mit dem offiziellen Alby-Handbuch & Einordnung in die Flavors
 
 - Alby Hub Handbuch: https://guides.getalby.com/user-guide/alby-hub
 - Getting Started: https://guides.getalby.com/user-guide/alby-hub/getting-started
 - Alby Hub Flavors: https://guides.getalby.com/user-guide/alby-hub/alby-hub-flavors
+
+Die offiziellen **Alby Hub Flavors** sind Deployment-Optionen – sie beschreiben, **wo** Alby Hub betrieben wird:
+- Alby Cloud
+- Desktop
+- Docker
+- Umbrel/Start9/etc.
+- Linux
+
+**Einordnung dieses Add-ons:**
+
+| Add-on-Modus | Einordnung | Was passiert |
+|---|---|---|
+| `node_mode: expert` | **Umbrel / Start9 / etc. – aber für Home Assistant** | Alby Hub läuft vollständig im Add-on auf dem HA-System. Home Assistant ist die Hosting-Plattform. |
+| `node_mode: cloud` | **Kein eigener Hub im Add-on** | Das Add-on verbindet HA per NWC mit einem Hub, der woanders läuft (z. B. Alby Cloud, Docker, Linux, etc.). |
+
+**Expert-Modus: Backend-Auswahl**
+
+| `node_backend` | Bedeutung |
+|---|---|
+| `LDK` | Eingebetteter Lightning-Node im Hub (empfohlen für Einsteiger) |
+| `LND` / `CLN` / `Phoenixd` / `Cashu` | Hub verbindet sich mit einem bestehenden eigenen Node (BYON – Bring Your Own Node) |
 
 ## Installation und Konfiguration in Home Assistant (HACS + manuell)
 
@@ -104,21 +125,30 @@ Für die Cloud-Anbindung in diesem Add-on benötigst du einen Alby Account:
 - Alby Hub: `https://albyhub.com`
 - Aktuelle Modelle/Pläne: `https://getalby.com/pricing`
 
-#### Welches Alby-Modell ist für welchen Einsatzzweck sinnvoll?
+#### Welcher Hub-Startpunkt passt zu dir?
 
-| Modell | Geeignet für | Empfehlung |
+| Option | Geeignet für | Empfehlung |
 |---|---|---|
-| **Alby Hub Cloud** (gehostet) | Du willst schnell starten, ohne eigenen Server/Node-Betrieb | Standard für Einsteiger und Cloud-Modus im Add-on |
-| **Self-Hosted Alby Hub** | Du willst Self-Custody mit eigener Infrastruktur und maximaler Kontrolle | Für fortgeschrittene Nutzer |
-| **Eigenes externes Backend/Wallet (BYOW/BYON)** | Du betreibst bereits LND/CLN/Phoenixd/Cashu und willst Alby als Verbindungs-/App-Schicht | Für bestehende Node-Setups |
+| **Alby Cloud** (von Alby gehostet) | Schnellstart ohne eigene Server-Infrastruktur | Beste Wahl für Einsteiger, die keinen Hub selbst hosten möchten |
+| **Expert-Modus dieses Add-ons** (Hub direkt in HA) | Hub auf dem eigenen HA-System betreiben | Für HA-Nutzer mit Bedarf an lokalem Hub |
+| **Anderer selbst-gehosteter Hub** (Docker, Linux, Umbrel, ...) | Volle Kontrolle, Infrastruktur außerhalb von HA | Für fortgeschrittene Nutzer mit eigenem Server |
 
 #### Einordnung dieses Add-ons in die offiziellen Alby Hub Flavors
 
-| Add-on-Einstellung | Offizieller Flavor | Bedeutung |
+Die offiziellen **Alby Hub Flavors** beschreiben, **wo** Alby Hub betrieben wird:
+Alby Cloud · Desktop · Docker · Umbrel/Start9/etc. · Linux
+
+| Add-on-Modus | Einordnung | Was passiert |
 |---|---|---|
-| `node_mode: cloud` | **Alby Hub Cloud** | Das Add-on verbindet Home Assistant per NWC mit einem externen gehosteten Alby Hub. |
-| `node_mode: expert` + `node_backend: LDK` | **Self-Hosted Alby Hub** | Alby Hub läuft lokal im Add-on mit eingebettetem Backend. |
-| `node_mode: expert` + `node_backend: LND/CLN/Phoenixd/Cashu` | **Bring Your Own Node/Wallet (BYON/BYOW)** | Alby Hub läuft im Add-on, nutzt aber ein externes eigenes Backend. |
+| `node_mode: expert` | **Umbrel / Start9 / etc. – für Home Assistant** | Alby Hub läuft vollständig im Add-on auf dem HA-System. Home Assistant ist die Hosting-Plattform. |
+| `node_mode: cloud` | **Kein eigener Hub im Add-on** | Das Add-on verbindet HA per NWC mit einem Hub, der woanders läuft (z. B. Alby Cloud, eigener Docker-Hub, etc.). |
+
+**Expert-Modus: Backend-Auswahl (BYON – Bring Your Own Node)**
+
+| `node_backend` | Bedeutung |
+|---|---|
+| `LDK` | Eingebetteter Lightning-Node im Hub (empfohlen für Einsteiger) |
+| `LND` / `CLN` / `Phoenixd` / `Cashu` | Hub verbindet sich mit einem bestehenden eigenen Node |
 
 #### NWC-Verbindung erstellen und im Add-on nutzen
 
