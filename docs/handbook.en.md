@@ -84,7 +84,7 @@ If funds are not visible after recovery:
 
 ### Prerequisites
 
-- Home Assistant **2026.1+**
+- Home Assistant **2026.1+** (approved for **2026.x**)
 - For add-on usage: Home Assistant with **Supervisor/add-on support** (HA OS or Supervised)
 - Network access to:
   - Add-on repository: `https://github.com/northpower25/ha-btc-alby-hub-addon`
@@ -95,11 +95,18 @@ If funds are not visible after recovery:
 #### A1) Install the add-on (first)
 
 1. **Add the add-on repository**  
-   Home Assistant → Settings → Add-ons → Add-on Store → menu (⋮) → Repositories  
-   Add URL: `https://github.com/northpower25/ha-btc-alby-hub-addon`
-2. **Install/start the add-on**  
+   In Home Assistant 2026.x:  
+   **Settings → Add-ons → Add-on Store → menu (⋮) → Repositories**.
+2. **Fill out the repository dialog**  
+   In the **Repositories** dialog:
+   - **Repository URL**: `https://github.com/northpower25/ha-btc-alby-hub-addon`
+   - Type/Category: **Add-on repository**
+   - Confirm with **Add**.
+3. **Verify the repository entry**  
+   Ensure the repository appears in the list, then close the dialog.
+4. **Install/start the add-on**  
    Open “Alby Hub (Bitcoin Lightning)”, install, and start it.
-3. **Configure the add-on**  
+5. **Configure the add-on**  
    Then complete the section “Configure the add-on (step by step)”.
 
 #### A2) Install the integration (afterwards)
