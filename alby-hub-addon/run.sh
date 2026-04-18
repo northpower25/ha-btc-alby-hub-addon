@@ -6,12 +6,15 @@ set -e
 # ──────────────────────────────────────────────
 NODE_MODE=$(bashio::config 'node_mode')
 LOG_LEVEL=$(bashio::config 'log_level')
+TOR_ENABLED=$(bashio::config 'tor_enabled')
+TOR_SOCKS5_URL=$(bashio::config 'tor_socks5_url')
 NOSTR_RELAY_ENABLED=$(bashio::config 'nostr_relay_enabled')
 BACKUP_PASSPHRASE=$(bashio::config 'backup_passphrase')
 EXTERNAL_ACCESS_ENABLED=$(bashio::config 'external_access_enabled')
 
 bashio::log.info "Starting Alby Hub add-on..."
 bashio::log.info "  Mode      : ${NODE_MODE}"
+bashio::log.info "  Tor       : ${TOR_ENABLED}"
 bashio::log.info "  NOSTR     : ${NOSTR_RELAY_ENABLED}"
 bashio::log.info "  External  : ${EXTERNAL_ACCESS_ENABLED}"
 bashio::log.warning "BETA WARNING: This add-on is beta software."
@@ -33,6 +36,33 @@ export LOG_LEVEL="${LOG_LEVEL}"
 NOSTR_PROXY_TARGET_DEFAULT="ws://127.0.0.1:7447/v1"
 NOSTR_PROXY_PORT_DEFAULT="3334"
 RELAY_CHECK_TIMEOUT_SECONDS="8"
+
+# Optional Tor proxy routing for outbound traffic
+if bashio::var.true "${TOR_ENABLED}"; then
+    if [ -z "${TOR_SOCKS5_URL}" ]; then
+        TOR_SOCKS5_URL="socks5h://127.0.0.1:9050"
+    fi
+
+    case "${TOR_SOCKS5_URL}" in
+      socks5://*|socks5h://*|http://*|https://*)
+        ;;
+      *)
+        bashio::log.error "Invalid tor_socks5_url: must start with socks5://, socks5h://, http:// or https://"
+        exit 1
+        ;;
+    esac
+
+    export ALL_PROXY="${TOR_SOCKS5_URL}"
+    export HTTP_PROXY="${TOR_SOCKS5_URL}"
+    export HTTPS_PROXY="${TOR_SOCKS5_URL}"
+    export all_proxy="${TOR_SOCKS5_URL}"
+    export http_proxy="${TOR_SOCKS5_URL}"
+    export https_proxy="${TOR_SOCKS5_URL}"
+    export NO_PROXY="127.0.0.1,localhost,::1"
+    export no_proxy="127.0.0.1,localhost,::1"
+
+    bashio::log.warning "Tor proxy routing is ENABLED for outbound traffic via ${TOR_SOCKS5_URL}"
+fi
 
 url_decode() {
     local encoded="${1//+/ }"

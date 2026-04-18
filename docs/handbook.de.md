@@ -152,6 +152,105 @@ Wenn Funds nach Recovery nicht sichtbar sind:
 4. Bei Expert-Modus: Ingress öffnen, Hub initial einrichten/unlocken und NWC-Verbindung in „Apps“ erzeugen.
 5. In der Integration den NWC-String eintragen und Verbindungstest ausführen.
 
+## Add-on-Optionen im Detail (inkl. Direktlinks aus der Konfigurationsmaske)
+
+<a id="addon-setting-node-mode-de"></a>
+### `node_mode`
+- `cloud`: Kein lokaler Hub im Add-on. Du brauchst `nwc_connection_string`.
+- `expert`: Alby Hub läuft lokal im Add-on. Du brauchst Backend-Einstellungen.
+
+<a id="addon-setting-log-level-de"></a>
+### `log_level`
+- Steuert die Detailtiefe der Logs.
+- Für normale Nutzung: `info`.
+- Für Fehlersuche: `debug` oder `trace` (mehr Daten im Log).
+
+<a id="addon-setting-tor-enabled-de"></a>
+### `tor_enabled`
+- Aktiviert ausgehende Kommunikation über einen Proxy (typisch Tor SOCKS5).
+- Standard: `false`.
+- Nur aktivieren, wenn im Heimnetz ein erreichbarer Tor-/SOCKS-Proxy existiert.
+
+<a id="addon-setting-tor-socks5-url-de"></a>
+### `tor_socks5_url`
+- Proxy-URL für Tor/ SOCKS5, z. B. `socks5h://127.0.0.1:9050`.
+- Wird nur verwendet, wenn `tor_enabled: true`.
+- `socks5h://` ist empfohlen, damit DNS ebenfalls über Tor aufgelöst wird.
+
+<a id="addon-setting-nostr-relay-enabled-de"></a>
+### `nostr_relay_enabled`
+- Startet zusätzlich den lokalen NOSTR-Relay-Proxy auf Port `3334`.
+- Nur im Expert-Modus relevant.
+
+<a id="addon-setting-backup-passphrase-de"></a>
+### `backup_passphrase`
+- Aktiviert verschlüsselte Backups im Add-on.
+- Gut merken und sicher verwahren; ohne Passphrase kann ein Restore scheitern.
+
+<a id="addon-setting-external-access-enabled-de"></a>
+### `external_access_enabled`
+- `false`: Add-on bindet nur lokal.
+- `true`: Add-on bindet auf alle Interfaces (`0.0.0.0`).
+- Nur mit sauberer Firewall-/Netzwerkabsicherung aktivieren.
+
+<a id="addon-setting-nwc-connection-string-de"></a>
+### `nwc_connection_string`
+- Nur für Cloud-Modus verpflichtend.
+- Muss mit `nostr+walletconnect://` beginnen und `relay` + `secret` enthalten.
+- Erzeugung: Alby Hub → Apps → Add Connection.
+
+<a id="addon-setting-bitcoin-network-de"></a>
+### `bitcoin_network`
+- Nur im Expert-Modus relevant.
+- Muss zum verwendeten Backend und deinem Wallet-Setup passen (`mainnet`, `testnet`, `signet`, `mutinynet`).
+
+<a id="addon-setting-node-backend-de"></a>
+### `node_backend`
+- Nur im Expert-Modus relevant.
+- `LDK`: eingebettet (einfachster Start).
+- `LND`, `CLN`, `Phoenixd`, `Cashu`: externe/alternative Backends mit eigenen Zugangsdaten.
+
+<a id="addon-setting-hub-unlock-password-de"></a>
+### `hub_unlock_password`
+- Optional im Expert-Modus.
+- Setzt Auto-Unlock beim Start.
+- Als Secret behandeln und sicher speichern.
+
+<a id="addon-setting-lnd-rest-url-de"></a>
+### `lnd_rest_url`
+- Nur bei `node_backend: LND`.
+- REST-URL deiner LND-Instanz.
+
+<a id="addon-setting-lnd-macaroon-hex-de"></a>
+### `lnd_macaroon_hex`
+- Nur bei `node_backend: LND`.
+- Macaroon als HEX-String für API-Zugriff.
+
+<a id="addon-setting-lnd-tls-cert-de"></a>
+### `lnd_tls_cert`
+- Nur bei `node_backend: LND`.
+- Optionales TLS-Zertifikat (HEX), falls deine LND-API TLS-Validierung benötigt.
+
+<a id="addon-setting-cln-rest-url-de"></a>
+### `cln_rest_url`
+- Nur bei `node_backend: CLN`.
+- REST-URL deiner CLN-Instanz.
+
+<a id="addon-setting-cln-rune-de"></a>
+### `cln_rune`
+- Nur bei `node_backend: CLN`.
+- Authentifizierungs-Rune für CLN-API.
+
+<a id="addon-setting-phoenixd-url-de"></a>
+### `phoenixd_url`
+- Nur bei `node_backend: Phoenixd`.
+- URL deiner phoenixd-Instanz.
+
+<a id="addon-setting-phoenixd-password-de"></a>
+### `phoenixd_password`
+- Nur bei `node_backend: Phoenixd`.
+- API-Passwort für phoenixd.
+
 ### Funktionstest nach der Einrichtung
 
 1. In der Integration Entitäten/Status prüfen.

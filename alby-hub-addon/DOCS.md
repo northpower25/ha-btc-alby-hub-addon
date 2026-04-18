@@ -34,6 +34,8 @@ Dieses Add-on stellt Alby Hub für Home Assistant bereit.
 ## Konfigurationshinweise
 
 - `nwc_connection_string`: Nur im Cloud-Modus erforderlich (`nostr+walletconnect://...`)
+- `tor_enabled`: Aktiviert ausgehende Kommunikation über Proxy/Tor
+- `tor_socks5_url`: Tor/SOCKS-Proxy-URL (z. B. `socks5h://127.0.0.1:9050`), nur bei `tor_enabled: true`
 - `external_access_enabled`: Bindet bei `true` an `0.0.0.0`; nur mit geeigneter Firewall nutzen
 - `backup_passphrase`: Aktiviert verschlüsselte Backups
 - `hub_unlock_password`: Aktiviert Auto-Unlock im Expert-Modus
